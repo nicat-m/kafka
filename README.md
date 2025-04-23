@@ -19,6 +19,7 @@
         ├── scripts
         │    ├── create-ssl.sh
         │    ├── terraform
+             ├── ansible
         ├── client.properties
         ├── server-1.properties
         ├── server-2.properties
