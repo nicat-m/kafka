@@ -1,4 +1,4 @@
-![Logo](https://i0.wp.com/softwareengineeringdaily.com/wp-content/uploads/2018/06/apache-kafka.png?fit=1200%2C1200&ssl=1)
+[![Logo](images/kafka.png)]
 
 # Kafka Multi Node Cluster Setup with SASL_SSL and SCRAM Authentication with ACL (KRaft Mode)
 
