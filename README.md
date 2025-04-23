@@ -1,3 +1,5 @@
+![Logo](https://static-00.iconduck.com/assets.00/kafka-icon-2048x935-cvu4503l.png)
+
 # Kafka Multi Node Cluster Setup with SASL_SSL and SCRAM Authentication with ACL (KRaft Mode)
 
 #### There are 2 types of installation and configure method if you want to deploy with terraform click "Automatic Installation" or click "Manual Installation"

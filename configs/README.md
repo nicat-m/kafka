@@ -139,37 +139,6 @@ scp broker2.keystore.jks kafka.truststore.jks user@broker2.local:/opt/kafka/cert
 ### 7. Let's get start config with SASL_SSL_SCRAM_SHA256 with ACL
 
 ```
-process.roles=broker,controller
-
-node.id=1 # change this each broker 1,2,3
-KAFKA_CLUSTER_ID="your-cluster-id"
-
-controller.quorum.bootstrap.servers=broker1.local:9093, broker2.local:9093, broker3.local:9093
-controller.quorum.voters=1@broker1.local:9093,2@broker2.local:9093,3@broker3.local:9093
-controller.listener.names=CONTROLLER
-
-num.network.threads=3
-num.io.threads=8
-
-socket.send.buffer.bytes=102400
-socket.receive.buffer.bytes=102400
-socket.request.max.bytes=104857600
-
-log.dirs=/var/log/kraft-combined-logs
-
-num.partitions=6
-num.recovery.threads.per.data.dir=1
-
-offsets.topic.replication.factor=2
-share.coordinator.state.topic.replication.factor=1
-share.coordinator.state.topic.min.isr=1
-transaction.state.log.replication.factor=2
-transaction.state.log.min.isr=1
-
-log.retention.hours=168
-log.segment.bytes=1073741824
-log.retention.check.interval.ms=300000
-
 # ACL
 authorizer.class.name=org.apache.kafka.metadata.authorizer.StandardAuthorizer
 allow.everyone.if.no.acl.found=false
@@ -195,4 +164,27 @@ ssl.truststore.password=123456
 ssl.endpoint.identification.algorithm=
 ```
 
-### 8.
+### 8. Create kafka Java Authentication and Authorization Service (JAAS) config
+
+```
+vim /opt/kafka/config/kafka-server-jaas.conf
+
+# copy and paste this config in this file:
+
+KafkaServer {
+  org.apache.kafka.common.security.scram.ScramLoginModule required
+  username="admin"
+  password="adminpass";
+};
+```
+#### Finally, you need to set the environment variable in the Kafka systemd service, as it must be available when Kafka starts and attempts to read the JAAS configuration file.
+
+```
+vim /etc/systemd/system/kafka.service
+
+Environment="KAFKA_OPTS=-Djava.security.auth.login.config=/opt/kafka/config/kafka-server-jaas.conf"
+
+sudo systemctl daemon-reload
+sudo systemctl restart kafka
+```
+
