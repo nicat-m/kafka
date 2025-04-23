@@ -1,4 +1,4 @@
-[![Logo](images/kafka.png)]
+![Logo](images/kafka.png)
 
 # Kafka Multi Node Cluster Setup with SASL_SSL and SCRAM Authentication with ACL (KRaft Mode)
 
