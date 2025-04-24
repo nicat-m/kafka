@@ -2,9 +2,6 @@
 ### 1. Install kafka each broker nodes
 
 ```
-# if you want specifig version to download visit this site: 
-  https://kafka.apache.org/downloads
-
 wget https://dlcdn.apache.org/kafka/4.0.0/kafka_2.13-4.0.0.tgz
 tar -xzvf kafka_2.13-4.0.0
 mv kafka_2.13-4.0.0/* /opt/kafka
@@ -29,6 +26,8 @@ node.id=1
 # The connect string for the controller quorum
 controller.quorum.bootstrap.servers=broker1.local:9093, broker2.local:9093, broker3.local:9093
 ...
+
+# Notice: set this domain in your dns or hosts file 
 ```
 
 ```node.id``` specified the node’s ID in the cluster. This is the first node, so it should be left at 1. All nodes must have unique node IDs, so the second and third nodes will have an ID of 2 and 3, respectively.
@@ -113,7 +112,7 @@ Kafka provides the kafka-metadata-quorum.sh script, which shows information abou
 
 ### 5. Create SCRAM admin user
 ```
-bin/kafka-configs.sh --bootstrap-server localhost:9092 \
+bin/kafka-configs.sh --bootstrap-server broker1.local:9092 \
  --alter --add-config 'SCRAM-SHA-256=[iterations=4096,password=adminpass]' \
  --entity-type users --entity-name admin
 ```
@@ -187,4 +186,93 @@ Environment="KAFKA_OPTS=-Djava.security.auth.login.config=/opt/kafka/config/kafk
 sudo systemctl daemon-reload
 sudo systemctl restart kafka
 ```
+
+### 9. Configure client for producer and consumer
+
+#### First we need to create topic
+```
+cd /opt/kafka
+
+./bin/kafka-topics.sh --create --topic test-topic \
+--bootstrap-server broker1.local:9092 --partitions 1 \
+--replication-factor 1 --command-config config/client.properties
+
+```
+
+#### Create scram user and give acl for specific topic
+
+```
+cd /opt/kafka
+
+bin/kafka-configs.sh --bootstrap-server broker1.local:9092 \
+--alter --add-config 'SCRAM-SHA-256=[iterations=4096,password=client123]' \
+--entity-type users --entity-name client1 \
+--command-config config/client.properties
+
+# Give Write permission to client1 user for produce
+
+bin/kafka-acls.sh --bootstrap-server broker1.local:9092 \
+--add --allow-principal User:client1 --operation Write \
+--topic test-topic --command-config config/client.properties
+
+# Give Read permission to client1 user for consume
+
+bin/kafka-acls.sh --bootstrap-server broker1.local:9092 \
+--add --allow-principal User:client1 --operation Read \
+--topic test-topic --command-config config/client.properties
+
+# Give group api permission to client1 user
+
+bin/kafka-acls.sh --bootstrap-server broker1.local:9092 \
+--add --allow-principal User:client1 --operation Read \
+--group rest-api-group --command-config config/client.properties
+
+```
+
+### 10. Install Kafka UI and verify that everything is working properly !!!
+
+```
+# I show with docker-compose
+
+version: '3.4'
+services:
+  kafka-ui:
+    container_name: kafka-ui
+    image: provectuslabs/kafka-ui:latest
+    extra_hosts:
+      - "broker1.local:10.122.65.180"
+      - "broker2.local:10.122.65.181"
+      - "broker3.local:10.122.65.182"
+    ports:
+      - 8080:8080
+    environment:
+      KAFKA_CLUSTERS_0_NAME: local
+      KAFKA_CLUSTERS_0_PROPERTIES_SECURITY_PROTOCOL: SASL_SSL
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: broker1.local:9092,broker2.local:9092,broker3.local:9092
+      KAFKA_CLUSTERS_0_SSL_TRUSTSTORELOCATION: /kafka.truststore.jks
+      KAFKA_CLUSTERS_0_SSL_TRUSTSTOREPASSWORD: "123456"
+      KAFKA_CLUSTERS_0_PROPERTIES_SASL_MECHANISM: SCRAM-SHA-256
+      KAFKA_CLUSTERS_0_PROPERTIES_SASL_JAAS_CONFIG: 'org.apache.kafka.common.security.scram.ScramLoginModule required username="admin" password="adminpass";'
+    volumes:
+      - ./kafka.truststore.jks:/kafka.truststore.jks
+```
+
+#### Broker Lists
+![Logo](../images/img.png)
+
+#### Topic Lists
+![Logo](../images/img_1.png)
+
+#### ACL Lists
+![Logo](../images/img_2.png)
+
+
+## Resources
+#### Kafka download: 
+* https://kafka.apache.org/downloads
+* [Kafka book](../images/Kafka-Definitive-Guide.pdf)
+#### Kafka-ui github repo url:
+* https://github.com/provectus/kafka-ui/tree/master/documentation/compose
+* https://github.com/provectus/kafka-ui/tree/master
+
 
