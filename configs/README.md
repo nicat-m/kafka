@@ -1,10 +1,16 @@
 ## Manual Installation
-### 1. Install kafka each broker nodes
+### 1. Install kafka and java-jdk each broker nodes
 
 ```
 wget https://dlcdn.apache.org/kafka/4.0.0/kafka_2.13-4.0.0.tgz
 tar -xzvf kafka_2.13-4.0.0
 mv kafka_2.13-4.0.0/* /opt/kafka
+
+# Debian
+sudo apt install -y openjdk-17-jdk
+
+# RHEL
+sudo yum install -y java-17-openjdk-devel
 ```
 First of all we need to run kafka without any security protocol for creating admin user
 ### 2. Change only this config in "server.properties" file each broker
@@ -36,6 +42,12 @@ controller.quorum.bootstrap.servers=broker1.local:9093, broker2.local:9093, brok
 
 ```
 ...
+# NOTICE: In first node set controller.quorum.voters like this: 
+
+# Do this in first node 
+controller.quorum.voters=1@broker1.local:9093
+
+# Do this other nodes 
 controller.quorum.voters=1@broker1.local:9093,2@broker2.local:9093,3@broker3.local:9093
 ...
 ```
@@ -189,14 +201,19 @@ sudo systemctl restart kafka
 
 ### 9. Configure client for producer and consumer
 
-#### First we need to create topic
+#### First we need to create client properties
 ```
-cd /opt/kafka
+cd /opt/kafka/config
 
-./bin/kafka-topics.sh --create --topic test-topic \
---bootstrap-server broker1.local:9092 --partitions 1 \
---replication-factor 1 --command-config config/client.properties
+vim client.properties
 
+# Copy and Paste this config for client
+
+ssl.truststore.location=/opt/kafka/certs/kafka.truststore.jks
+ssl.truststore.password=123456
+security.protocol=SASL_SSL
+sasl.mechanism=SCRAM-SHA-256
+sasl.jaas.config=org.apache.kafka.common.security.scram.ScramLoginModule required username="admin" password="adminpass";
 ```
 
 #### Create scram user and give acl for specific topic

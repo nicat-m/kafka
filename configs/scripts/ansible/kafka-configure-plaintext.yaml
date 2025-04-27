@@ -1,0 +1,23 @@
+- name: Kafka Plaintext Configuration
+  hosts: all_nodes
+  vars_files:
+    - variables/secrets.yaml
+    - variables/env.yaml
+  vars:
+    ansible_ssh_pass: "{{ ssh_password }}"
+  tasks:
+    - name: Copy server.properties file to kafka servers
+      template:
+        src: templates/server.properties.plaintext.j2
+        dest: "{{ KAFKA_SERVER_CONFIG }}"
+
+    - name: Copy kafka.service systemd file to servers
+      template:
+        src: templates/kafka.service.j2
+        dest: "{{ KAFKA_SERVICE_PATH }}"
+
+    - name: Set Kafka node.id
+      lineinfile:
+        path: /opt/kafka/config/kraft.properties
+        regexp: '^node.id='
+        line: "node.id={{ node_id }}"

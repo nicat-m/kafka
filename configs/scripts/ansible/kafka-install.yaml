@@ -1,0 +1,52 @@
+- name: Kafka installation
+  hosts: all_nodes
+  vars_files:
+    - variables/secrets.yaml
+    - variables/env.yaml
+  vars:
+    ansible_ssh_pass: "{{ ssh_password }}"
+  tasks:
+    - name: Ensure curl is installed
+      package:
+        name: curl
+        state: present
+
+    - name: Ensure java packages are installed (RHEL)
+      when: ansible_os_family == "RedHat"
+      yum:
+        name: java-17-openjdk-devel
+        state: present
+
+    - name: Ensure java packages are installed (Debian/Ubuntu)
+      when: ansible_os_family == "Debian"
+      apt:
+        name: openjdk-17-jdk
+        state: present
+        update_cache: yes
+
+    - name: Java version
+      shell: java -version
+      register: java_version
+
+    - name: Show java version
+      debug:
+        var: java_version.stderr_lines
+
+    - name: Download Kafka
+      get_url:
+        url: "{{ KAFKA_URL }}"
+        dest: "/tmp/"
+
+    - name: Extract Kafka
+      unarchive:
+        src: "/tmp/{{ KAFKA_TARBALL }}"
+        dest: /tmp
+        remote_src: yes
+
+    - name: Move Kafka directory
+      shell: mv "/tmp/{{ KAFKA_EXTRACT }}" "{{ KAFKA_DIR }}"
+
+    - name: Remove tarball
+      file:
+        path: "/tmp/{{ KAFKA_TARBALL }}"
+        state: absent

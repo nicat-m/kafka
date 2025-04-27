@@ -1,0 +1,9 @@
+[controller]
+broker1.local node_id=1
+[brokers]
+broker2.local node_id=2
+broker3.local node_id=3
+
+[all_nodes:children]
+controller
+brokers
