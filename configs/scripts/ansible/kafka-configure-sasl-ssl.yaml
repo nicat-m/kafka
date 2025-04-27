@@ -1,0 +1,160 @@
+- name: Kafka SASL_SSL Configuration
+  hosts: all_nodes
+  vars_files:
+    - variables/secrets.yaml
+    - variables/env.yaml
+  vars:
+    ansible_ssh_pass: "{{ ssh_password }}"
+  tasks:
+
+    - name: Copy server.properties file to kafka servers
+      template:
+        src: templates/server.properties.plaintext.j2
+        dest: "{{ KAFKA_SERVER_CONFIG }}"
+
+    - name: Copy kafka.service systemd file to servers
+      template:
+        src: templates/kafka.service.j2
+        dest: "{{ KAFKA_SERVICE_PATH }}"
+
+    - name: Set Kafka node.id
+      lineinfile:
+        path: /opt/kafka/config/server.properties
+        regexp: '^node.id='
+        line: "node.id={{ node_id }}"
+
+    - name: Generate Log Storage
+      shell: "{{ KAFKA_DIR }}/bin/kafka-storage.sh format -t {{ KAFKA_CLUSTER_ID }} -c {{ KAFKA_SERVER_CONFIG }}"
+
+    - name: Restart service kafka also issue daemon-reload to pick up config changes
+      ansible.builtin.systemd_service:
+        state: restarted
+        daemon_reload: true
+        name: kafka
+
+    - name: Wait for 10 seconds for starting kafka cluster
+      pause:
+        seconds: 10
+
+    - name: Get Kafka Cluster Status
+      shell: "{{ KAFKA_DIR }}/bin/kafka-metadata-quorum.sh --bootstrap-controller {{ inventory_hostname }}:{{ CONTROLLER_PORT }} describe --status"
+      when: ('controller' in group_names)
+      register: kafka_cluster_output
+
+    - name: Show Kafka Cluster Status
+      debug:
+        var: kafka_cluster_output
+
+    - name: Create SCRAM admin user
+      shell: "{{KAFKA_DIR}}/bin/kafka-configs.sh --bootstrap-server {{inventory_hostname}}:9092 --alter --add-config 'SCRAM-SHA-256=[iterations=4096,password={{SASL_PASSWORD}}]' --entity-type users --entity-name {{SASL_USERNAME}}"
+      register: scram_output
+      when: ('controller' in group_names)
+
+    - name: Show creating scram user output
+      debug:
+        var: scram_output
+
+    - name: Stop service kafka in all hosts
+      ansible.builtin.systemd_service:
+        name: kafka
+        state: stopped
+
+    - name: Copy server.properties file to kafka servers
+      template:
+        src: templates/server.properties.saslssl.j2
+        dest: "{{ KAFKA_SERVER_CONFIG }}"
+
+    - name: Copy kafka.service systemd file to servers
+      template:
+        src: templates/kafka.service.j2
+        dest: "{{ KAFKA_SERVICE_PATH }}"
+
+    - name: Copy create-ssl.sh script to broker1
+      template:
+        src: templates/create-ssl.sh.j2
+        dest: "{{ SCRIPT_PATH }}"
+        mode: '0755'
+      when: ('controller' in group_names)
+
+    - name: Run script and create jks file for each brokers
+      shell: bash "{{ SCRIPT_PATH }}"
+      register: script_output
+      when: ('controller' in group_names)
+
+    - name: Show script result
+      debug:
+        var: script_output
+
+    - name: Find all .jks files
+      find:
+        paths: "{{KAFKA_DIR}}/certs"
+        patterns: "*.jks"
+      register: jks_files
+      when: ('controller' in group_names)
+
+    - name: Fetch all JKS files
+      fetch:
+        src: "{{ item.path }}"
+        dest: "./jks-files/"
+        flat: yes
+      loop: "{{ jks_files.files }}"
+      when: ('controller' in group_names)
+
+    - name: Ensure /opt/kafka/certs directory exists
+      file:
+        path: /opt/kafka/certs
+        state: directory
+        mode: '0755'
+      when: ('brokers' in group_names)
+
+    - name: Copy Keystore JKS files from local to each broker
+      copy:
+        src: "jks-files/{{ inventory_hostname }}.keystore.jks"
+        dest: "/opt/kafka/certs/{{ inventory_hostname }}.keystore.jks"
+        mode: '0600'
+      when: ('brokers' in group_names)
+
+    - name: Copy Truststore JKS file from local to each broker
+      copy:
+        src: "jks-files/kafka.truststore.jks"
+        dest: "/opt/kafka/certs/kafka.truststore.jks"
+        mode: '0600'
+      when: ('brokers' in group_names)
+
+    - name: Copy JAAS config to all servers
+      template:
+        src: templates/kafka-server-jaas.conf.j2
+        dest: "{{JAAS_PATH}}"
+
+    - name: Copy client.properties to all servers
+      template:
+        src: templates/client.properties.j2
+        dest: "{{KAFKA_DIR}}/config/client.properties"
+
+    - name: Set Kafka node.id
+      lineinfile:
+        path: /opt/kafka/config/server.properties
+        regexp: '^node.id='
+        line: "node.id={{ node_id }}"
+
+    - name: Generate Log Storage
+      shell: "{{ KAFKA_DIR }}/bin/kafka-storage.sh format -t {{ KAFKA_CLUSTER_ID }} -c {{ KAFKA_SERVER_CONFIG }} --add-scram SCRAM-SHA-256=[name=admin,password=admin]"
+
+    - name: Restart service kafka also issue daemon-reload to pick up config changes
+      ansible.builtin.systemd_service:
+        state: restarted
+        daemon_reload: true
+        name: kafka
+
+    - name: Wait for 10 seconds for starting kafka cluster
+      pause:
+        seconds: 10
+
+    - name: Get Kafka Cluster Status
+      shell: "{{ KAFKA_DIR }}/bin/kafka-metadata-quorum.sh --bootstrap-controller {{ inventory_hostname }}:{{ CONTROLLER_PORT }} describe --status --command-config {{ KAFKA_DIR }}/config/client.properties"
+      when: ('controller' in group_names)
+      register: kafka_cluster_output
+
+    - name: Show Kafka Cluster Status
+      debug:
+        var: kafka_cluster_output

@@ -3,9 +3,7 @@ process.roles=broker,controller
 node.id= {{ node_id }}
 KAFKA_CLUSTER_ID={{ KAFKA_CLUSTER_ID }}
 
-controller.quorum.bootstrap.servers={% for i in groups['all'] %}{{ hostvars[i]['inventory_hostname'] }}:{{ CONTROLLER_PORT }}{% if not loop.last %}, {% endif %}{% endfor %}
-
-controller.quorum.voters={% for i in groups['all'] %}{{ loop.index }}@{{ hostvars[i]['inventory_hostname'] }}:{{ CONTROLLER_PORT }}{% if not loop.last %}, {% endif %}{% endfor %}
+controller.quorum.voters={% if inventory_hostname == groups['all'][0] %}1@{{ hostvars[inventory_hostname]['inventory_hostname'] }}:{{ CONTROLLER_PORT }}{% else %}{% for host in groups['all'] %}{{ loop.index }}@{{ hostvars[host]['inventory_hostname'] }}:{{ CONTROLLER_PORT }}{% if not loop.last %},{% endif %}{% endfor %}{% endif %}
 
 controller.listener.names=CONTROLLER
 
@@ -32,23 +30,23 @@ log.dirs=/var/log/kraft-combined-logs
 # ACL
 authorizer.class.name=org.apache.kafka.metadata.authorizer.StandardAuthorizer
 allow.everyone.if.no.acl.found=false
-super.users=User:{{ SASL_USERNAME }}
+super.users=User:{{SASL_USERNAME}}
 
 # Listeners
 inter.broker.listener.name=SASL_SSL
-listener.name.controller.scram-sha-256.sasl.jaas.config=org.apache.kafka.common.security.scram.ScramLoginModule required username="{{ SASL_USERNAME }}" password="{{ SASL_PASSWORD }}";
-listeners={% for i in groups['all'] %}PLAINTEXT://{{ hostvars[i]['inventory_hostname'] }}:{{ BROKER_PORT }},CONTROLLER://{{ hostvars[i]['inventory_hostname'] }}:{{ CONTROLLER_PORT }}{% if not loop.last %}, {% endif %}{% endfor %}
+listener.name.controller.scram-sha-256.sasl.jaas.config=org.apache.kafka.common.security.scram.ScramLoginModule required username="{{SASL_USERNAME}}" password="{{SASL_PASSWORD}}";
+listeners=SASL_SSL://{{ inventory_hostname }}:{{ BROKER_PORT }},CONTROLLER://{{ inventory_hostname }}:{{ CONTROLLER_PORT }}
 listener.security.protocol.map=SASL_SSL:SASL_SSL,CONTROLLER:SASL_SSL
-advertised.listeners={% for i in groups['all'] %}PLAINTEXT://{{ hostvars[i]['inventory_hostname'] }}:{{ BROKER_PORT }}
+advertised.listeners=SASL_SSL://{{inventory_hostname}}:{{ BROKER_PORT }}
 
 # SASL & SSL configuration
 sasl.enabled.mechanisms=SCRAM-SHA-256
 sasl.mechanism.inter.broker.protocol=SCRAM-SHA-256
 sasl.mechanism.controller.protocol=SCRAM-SHA-256
 
-ssl.keystore.location=/opt/kafka/certs/broker1.local.keystore.jks
-ssl.keystore.password=123456
-ssl.key.password=123456
-ssl.truststore.location=/opt/kafka/certs/kafka.truststore.jks
-ssl.truststore.password=123456
+ssl.keystore.location={{KEYSTORE_PATH}}
+ssl.keystore.password={{KEYSTORE_PASS}}
+ssl.key.password={{KEY_PASS}}
+ssl.truststore.location={{TRUSTSTORE_PATH}}
+ssl.truststore.password={{TRUSTSTORE_PASS}}
 ssl.endpoint.identification.algorithm=

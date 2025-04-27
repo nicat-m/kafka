@@ -1,6 +1,5 @@
+# Kafka Multi Node Cluster Setup with SASL_SSL and ACL with SCRAM Authentication (KRaft Mode)
 ![Logo](images/kafka.png)
-
-# Kafka Multi Node Cluster Setup with SASL_SSL and SCRAM Authentication with ACL (KRaft Mode)
 
 #### There are 2 types of installation and configure method if you want to deploy with terraform click "Automatic Installation" or click "Manual Installation"
 

@@ -31,3 +31,6 @@ build/
 
 ### VS Code ###
 .vscode/
+
+### JKS FOLDER ###
+./configs/scripts/ansible/jks-files/*
