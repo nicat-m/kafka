@@ -14,7 +14,6 @@
     └── configs
         ├── scripts
         │    ├── create-ssl.sh
-        │    ├── terraform
         │    ├── ansible
         │          ├── ansible.cfg
         │          ├── inventory
@@ -27,6 +26,7 @@
         │          │      ├── server.properties.saslssl.j2
         │          │      ├── kafka.service.j2
         │          │      ├── client.properties.j2
+        │          │      ├── create-ssl.sh.j2
         │          ├── variables
         │                 ├── env.yaml
         │                 ├── secrets.yaml

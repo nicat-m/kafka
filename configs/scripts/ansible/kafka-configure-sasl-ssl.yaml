@@ -137,9 +137,6 @@
         regexp: '^node.id='
         line: "node.id={{ node_id }}"
 
-    - name: Generate Log Storage
-      shell: "{{ KAFKA_DIR }}/bin/kafka-storage.sh format -t {{ KAFKA_CLUSTER_ID }} -c {{ KAFKA_SERVER_CONFIG }} --add-scram SCRAM-SHA-256=[name=admin,password=admin]"
-
     - name: Restart service kafka also issue daemon-reload to pick up config changes
       ansible.builtin.systemd_service:
         state: restarted
@@ -151,7 +148,7 @@
         seconds: 10
 
     - name: Get Kafka Cluster Status
-      shell: "{{ KAFKA_DIR }}/bin/kafka-metadata-quorum.sh --bootstrap-controller {{ inventory_hostname }}:{{ CONTROLLER_PORT }} describe --status --command-config {{ KAFKA_DIR }}/config/client.properties"
+      shell: "{{ KAFKA_DIR }}/bin/kafka-metadata-quorum.sh --bootstrap-controller {{ inventory_hostname }}:{{ CONTROLLER_PORT }} --command-config {{ KAFKA_DIR }}/config/client.properties describe --status"
       when: ('controller' in group_names)
       register: kafka_cluster_output
 
