@@ -50,3 +50,10 @@
       file:
         path: "/tmp/{{ KAFKA_TARBALL }}"
         state: absent
+
+    - name: Set hostname in /etc/hosts file
+      lineinfile:
+        path: /etc/hosts
+        line: "{{ hostvars[item]['ansible_facts']['default_ipv4']['address'] }} {{ item }}"
+        state: present
+      loop: "{{ groups['all'] }}"

@@ -31,5 +31,7 @@ log.dirs=/var/log/kraft-combined-logs
 
 # Listeners
 inter.broker.listener.name=PLAINTEXT
-listeners={% for i in groups['all'] %}PLAINTEXT://{{ hostvars[i]['inventory_hostname'] }}:{{ BROKER_PORT }},CONTROLLER://{{ hostvars[i]['inventory_hostname'] }}:{{ CONTROLLER_PORT }}{% if not loop.last %}, {% endif %}{% endfor %}
-advertised.listeners={% for i in groups['all'] %}PLAINTEXT://{{ hostvars[i]['inventory_hostname'] }}:{{ BROKER_PORT }}
+
+listeners=PLAINTEXT://{{ inventory_hostname }}:{{ BROKER_PORT }},CONTROLLER://{{ inventory_hostname }}:{{ CONTROLLER_PORT }}
+
+advertised.listeners=PLAINTEXT://{{inventory_hostname}}:{{ BROKER_PORT }}

@@ -23,9 +23,10 @@
         │          ├── kafka-configure-plaintext.yaml
         │          ├── kafka-configure-sasl-ssl.yaml
         │          ├── templates
-        │          │      ├── kafka-jaas-conf.js
+        │          │      ├── kafka-server-jaas.conf.j2
         │          │      ├── server.properties.plaintext.j2
         │          │      ├── server.properties.saslssl.j2
+        │          │      ├── kafka.service.j2
         │          │      ├── client.properties.j2
         │          ├── variables
         │                 ├── env.yaml

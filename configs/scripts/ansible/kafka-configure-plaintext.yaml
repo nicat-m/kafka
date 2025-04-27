@@ -18,6 +18,28 @@
 
     - name: Set Kafka node.id
       lineinfile:
-        path: /opt/kafka/config/kraft.properties
+        path: /opt/kafka/config/server.properties
         regexp: '^node.id='
         line: "node.id={{ node_id }}"
+
+    - name: Generate Log Storage
+      shell: "{{ KAFKA_DIR }}/bin/kafka-storage.sh format -t {{ KAFKA_CLUSTER_ID }} -c {{ KAFKA_SERVER_CONFIG }}"
+
+    - name: Restart service kafka also issue daemon-reload to pick up config changes
+      ansible.builtin.systemd_service:
+        state: restarted
+        daemon_reload: true
+        name: kafka
+
+    - name: Wait for 10 seconds for starting kafka cluster
+      pause:
+        seconds: 10
+
+    - name: Get Kafka Cluster Status
+      shell: "{{ KAFKA_DIR }}/bin/kafka-metadata-quorum.sh --bootstrap-controller {{ inventory_hostname }}:{{ CONTROLLER_PORT }} describe --status"
+      when: ('controller' in group_names)
+      register: kafka_cluster_output
+
+    - name: Show Kafka Cluster Status
+      debug:
+        var: kafka_cluster_output
