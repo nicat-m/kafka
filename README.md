@@ -39,7 +39,8 @@
 ## Resources
 #### Kafka download:
 * https://kafka.apache.org/downloads
-* [Kafka book](../images/Kafka-Definitive-Guide.pdf)
+#### Kafka Book
+* [Kafka book](./images/Kafka-Definitive-Guide.pdf)
 #### Kafka-ui github repo url:
 * https://github.com/provectus/kafka-ui/tree/master/documentation/compose
 * https://github.com/provectus/kafka-ui/tree/master
