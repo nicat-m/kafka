@@ -1,3 +1,5 @@
+![Logo](../images/kafka-sasl.png)
+
 ## Manual Installation
 ### 1. Install kafka and java-jdk each broker nodes
 
