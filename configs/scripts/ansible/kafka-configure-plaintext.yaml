@@ -19,7 +19,7 @@
     - name: Set Kafka node.id
       lineinfile:
         path: /opt/kafka/config/server.properties
-        regexp: '^node.id='
+        regexp: "^node.id="
         line: "node.id={{ node_id }}"
 
     - name: Generate Log Storage

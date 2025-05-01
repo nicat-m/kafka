@@ -6,7 +6,6 @@
   vars:
     ansible_ssh_pass: "{{ ssh_password }}"
   tasks:
-
     - name: Copy server.properties file to kafka servers
       template:
         src: templates/server.properties.plaintext.j2
@@ -20,7 +19,7 @@
     - name: Set Kafka node.id
       lineinfile:
         path: /opt/kafka/config/server.properties
-        regexp: '^node.id='
+        regexp: "^node.id="
         line: "node.id={{ node_id }}"
 
     - name: Generate Log Storage
@@ -42,7 +41,6 @@
       register: kafka_cluster_output
 
     - name: Show Kafka Cluster Status
-      debug:
         var: kafka_cluster_output
 
     - name: Create SCRAM admin user
@@ -59,7 +57,7 @@
         name: kafka
         state: stopped
 
-    - name: Copy server.properties file to kafka servers
+    - name: Copy server.properties file to kafka servers 
       template:
         src: templates/server.properties.saslssl.j2
         dest: "{{ KAFKA_SERVER_CONFIG }}"
@@ -73,7 +71,7 @@
       template:
         src: templates/create-ssl.sh.j2
         dest: "{{ SCRIPT_PATH }}"
-        mode: '0755'
+        mode: "0755"
       when: ('controller' in group_names)
 
     - name: Run script and create jks file for each brokers
@@ -104,21 +102,21 @@
       file:
         path: /opt/kafka/certs
         state: directory
-        mode: '0755'
+        mode: "0755"
       when: ('brokers' in group_names)
 
     - name: Copy Keystore JKS files from local to each broker
       copy:
         src: "jks-files/{{ inventory_hostname }}.keystore.jks"
         dest: "/opt/kafka/certs/{{ inventory_hostname }}.keystore.jks"
-        mode: '0600'
+        mode: "0600"
       when: ('brokers' in group_names)
 
     - name: Copy Truststore JKS file from local to each broker
       copy:
         src: "jks-files/kafka.truststore.jks"
         dest: "/opt/kafka/certs/kafka.truststore.jks"
-        mode: '0600'
+        mode: "0600"
       when: ('brokers' in group_names)
 
     - name: Copy JAAS config to all servers
@@ -134,7 +132,7 @@
     - name: Set Kafka node.id
       lineinfile:
         path: /opt/kafka/config/server.properties
-        regexp: '^node.id='
+        regexp: "^node.id="
         line: "node.id={{ node_id }}"
 
     - name: Restart service kafka also issue daemon-reload to pick up config changes
