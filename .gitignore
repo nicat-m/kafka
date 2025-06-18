@@ -34,3 +34,7 @@ build/
 
 ### JKS FOLDER ###
 configs/scripts/ansible/jks-files/*.jks
+configs/scripts/terraform/.terraform*
+configs/scripts/terraform/terraform.tfsate*
+configs/scripts/ansible/inventory.ini
+configs/scripts/terraform/*.plan

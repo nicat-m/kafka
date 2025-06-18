@@ -32,24 +32,33 @@
       debug:
         var: java_version.stderr_lines
 
+    - name: Check if Kafka is already installed
+      stat:
+        path: "{{ KAFKA_DIR }}/bin/kafka-server-start.sh"
+      register: kafka_installed
+
     - name: Download Kafka
       get_url:
         url: "{{ KAFKA_URL }}"
         dest: "/tmp/"
+      when: not kafka_installed.stat.exists
 
     - name: Extract Kafka
       unarchive:
         src: "/tmp/{{ KAFKA_TARBALL }}"
         dest: /tmp
         remote_src: yes
+      when: not kafka_installed.stat.exists
 
     - name: Move Kafka directory
       shell: mv "/tmp/{{ KAFKA_EXTRACT }}" "{{ KAFKA_DIR }}"
+      when: not kafka_installed.stat.exists
 
     - name: Remove tarball
       file:
         path: "/tmp/{{ KAFKA_TARBALL }}"
         state: absent
+      when: not kafka_installed.stat.exists
 
     - name: Set hostname in /etc/hosts file
       lineinfile:
@@ -57,3 +66,4 @@
         line: "{{ hostvars[item]['ansible_facts']['default_ipv4']['address'] }} {{ item }}"
         state: present
       loop: "{{ groups['all'] }}"
+      when: not kafka_installed.stat.exists
