@@ -92,3 +92,35 @@ variable "vm_disk_size" {
 variable "vm_disk_thin" {
   description = "Disk type of the created virtual machine , thin or thick"
 }
+
+variable "kafka_config" {
+  type = object({
+    kafka_version     = string
+    scala_version     = string
+    kafka_dir         = string
+    kafka_cluster_id  = string
+    broker_port       = number
+    controller_port   = number
+    sasl_username     = string
+    sasl_password     = string
+    keystore_pass     = string
+    key_pass          = string
+    truststore_pass   = string
+  })
+}
+
+variable "ssh_password" {
+  type = string
+  sensitive = true
+}
+
+variable "ansible_config" {
+  type = object({
+    become              = bool
+    become_ask_pass     = bool
+    become_method       = string
+    become_user         = string
+    host_key_checking   = bool
+    remote_user         = string
+  })
+}

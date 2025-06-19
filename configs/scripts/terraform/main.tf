@@ -74,6 +74,45 @@ resource "local_file" "ansible_inventory" {
   })
 }
 
+resource "local_file" "ansible_env_yaml" {
+  filename = "../ansible/variables/env.yaml"
+
+  content = templatefile("${path.module}/files/env.tpl", {
+    kafka_version     = var.kafka_config.kafka_version
+    scala_version     = var.kafka_config.scala_version
+    kafka_dir         = var.kafka_config.kafka_dir
+    kafka_cluster_id  = var.kafka_config.kafka_cluster_id
+    broker_port       = var.kafka_config.broker_port
+    controller_port   = var.kafka_config.controller_port
+    sasl_username     = var.kafka_config.sasl_username
+    sasl_password     = var.kafka_config.sasl_password
+    keystore_pass     = var.kafka_config.keystore_pass
+    key_pass          = var.kafka_config.key_pass
+    truststore_pass   = var.kafka_config.truststore_pass
+  })
+}
+
+resource "local_file" "ansible_secrets_yaml" {
+  filename = "../ansible/variables/secrets.yaml"
+
+  content = templatefile("${path.module}/files/secrets.tpl", {
+    ssh_password = var.ssh_password
+  })
+}
+
+resource "local_file" "ansible_config" {
+  filename = "../ansible/ansible.cfg"
+
+  content = templatefile("${path.module}/files/ansible.tpl", {
+    become            = var.ansible_config.become
+    become_ask_pass   = var.ansible_config.become_ask_pass
+    become_method     = var.ansible_config.become_method
+    become_user       = var.ansible_config.become_user
+    host_key_checking = var.ansible_config.host_key_checking
+    remote_user       = var.ansible_config.remote_user  
+  })
+}
+
 resource "null_resource" "run_ansible" {
   depends_on = [
     vsphere_virtual_machine.vm,

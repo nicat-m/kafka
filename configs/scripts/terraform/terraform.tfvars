@@ -48,3 +48,31 @@ vms = {
   },
 }
 
+## Kafka ENV
+
+kafka_config = {
+  kafka_version       = "4.0.0"
+  scala_version       = "2.13"
+  kafka_dir           = "/opt/kafka"
+  kafka_cluster_id    = "kafkademo"
+  broker_port         = 9092
+  controller_port     = 9093
+  sasl_username       = "admin"
+  sasl_password       = "adminpass"
+  keystore_pass       = "123456"
+  key_pass            = "123456"
+  truststore_pass     = "123456"
+}
+
+ssh_password = "Linux@nm!"
+
+## Ansible config env
+
+ansible_config = {
+  become = true
+  host_key_checking = false
+  remote_user = "nicat"
+  become_method = "sudo"
+  become_ask_pass = false
+  become_user = "root"
+}
