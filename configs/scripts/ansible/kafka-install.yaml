@@ -5,11 +5,49 @@
     - variables/env.yaml
   vars:
     ansible_ssh_pass: "{{ ssh_password }}"
+    ansible_become_pass: "{{ ssh_password }}"
   tasks:
+    - name: Set http proxy 
+      ansible.builtin.lineinfile:
+        path: /etc/profile
+        line: 'export http_proxy=http://10.122.53.153:3128'
+        state: present
+        insertafter: EOF
+        create: yes
+
+    - name: Set https proxy 
+      ansible.builtin.lineinfile:
+        path: /etc/profile
+        line: 'export https_proxy=http://10.122.53.153:3128'
+        state: present
+        insertafter: EOF
+        create: yes
+
+    - name: Remove Kafka installation directory if exists
+      ansible.builtin.file:
+        path: /opt/kafka
+        state: absent
+
+    - name: Remove Kafka KRaft logs directory if exists
+      ansible.builtin.file:
+        path: /var/log/kraft-combined-logs/
+        state: absent
+
+    - name: source /etc/profile 
+      ansible.builtin.shell: source /etc/profile
+      args:
+        executable: /bin/bash
+
     - name: Ensure curl is installed
       package:
         name: curl
         state: present
+
+    - name: remove old java
+      when: ansible_os_family == "RedHat"
+      yum:
+        name: java-1.8.0-openjdk-headless.x86_64
+        state: absent
 
     - name: Ensure java packages are installed (RHEL)
       when: ansible_os_family == "RedHat"
@@ -36,6 +74,9 @@
       get_url:
         url: "{{ KAFKA_URL }}"
         dest: "/tmp/"
+      environment:
+        http_proxy: "http://10.122.53.153:3128"
+        https_proxy: "http://10.122.53.153:3128"
 
     - name: Extract Kafka
       unarchive:
