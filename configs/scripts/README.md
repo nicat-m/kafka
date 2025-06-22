@@ -9,6 +9,7 @@
                   ├── kafka-install.yaml
                   ├── kafka-configure-plaintext.yaml
                   ├── kafka-configure-sasl-ssl.yaml
+                  ├── acl-create-user.yaml                  
                   ├── templates
                   │      ├── kafka-server-jaas.conf.j2
                   │      ├── server.properties.plaintext.j2
@@ -16,6 +17,7 @@
                   │      ├── kafka.service.j2
                   │      ├── client.properties.j2
                   │      ├── create-ssl.sh.j2
+                  │      ├── create-acl.sh.j2
                   ├── variables
                          ├── env.yaml
                          ├── secrets.yaml
