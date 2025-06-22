@@ -32,8 +32,6 @@
         │                 ├── secrets.yaml
         ├── client.properties
         ├── server-1.properties
-        ├── server-2.properties
-        └── server-3.properties
 
 
 ## Resources

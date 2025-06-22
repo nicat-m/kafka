@@ -44,12 +44,8 @@ controller.quorum.bootstrap.servers=broker1.local:9093, broker2.local:9093, brok
 
 ```
 ...
-# NOTICE: In first node set controller.quorum.voters like this: 
 
-# Do this in first node 
-controller.quorum.voters=1@broker1.local:9093
-
-# Do this other nodes 
+# Do this all nodes 
 controller.quorum.voters=1@broker1.local:9093,2@broker2.local:9093,3@broker3.local:9093
 ...
 ```
@@ -155,21 +151,20 @@ scp broker2.keystore.jks kafka.truststore.jks user@broker2.local:/opt/kafka/cert
 # ACL
 authorizer.class.name=org.apache.kafka.metadata.authorizer.StandardAuthorizer
 allow.everyone.if.no.acl.found=false
-super.users=User:admin
+super.users=User:ANONYMOUS;User:admin
 
 # Listeners
-inter.broker.listener.name=SASL_SSL
-listener.name.controller.scram-sha-256.sasl.jaas.config=org.apache.kafka.common.security.scram.ScramLoginModule required username="admin" password="adminpass";
-listeners=SASL_SSL://broker1.local:9092,CONTROLLER://broker1.local:9093 # change this for each broker hostname
-listener.security.protocol.map=SASL_SSL:SASL_SSL,CONTROLLER:SASL_SSL
-advertised.listeners=SASL_SSL://broker1.local:9092 # change this for each broker 
+inter.broker.listener.name=BROKER
+listeners=CLIENT://broker1:9092,CONTROLLER://broker1:9093,BROKER://broker1:9094
+listener.security.protocol.map=CLIENT:SASL_SSL,CONTROLLER:SSL,BROKER:SSL
+listener.name.client.scram-sha-256.sasl.jaas.config=org.apache.kafka.common.security.scram.ScramLoginModule required username="admin" password="123456";
+advertised.listeners=BROKER://broker1:9094,CLIENT://broker1:9092
 
 # SASL & SSL configuration
 sasl.enabled.mechanisms=SCRAM-SHA-256
 sasl.mechanism.inter.broker.protocol=SCRAM-SHA-256
-sasl.mechanism.controller.protocol=SCRAM-SHA-256
 
-ssl.keystore.location=/opt/kafka/certs/broker1.keystore.jks # change this for each broker
+ssl.keystore.location=/opt/kafka/certs/broker1.keystore.jks
 ssl.keystore.password=123456
 ssl.key.password=123456
 ssl.truststore.location=/opt/kafka/certs/kafka.truststore.jks

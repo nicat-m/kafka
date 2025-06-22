@@ -1,8 +1,4 @@
-[controller]
-broker1 node_id=1
 [brokers]
-broker2 node_id=2
-broker3 node_id=3
-[all_nodes:children]
-controller
-brokers
+10.122.40.191 node_id=1
+10.122.40.192 node_id=2
+10.122.40.193 node_id=3
