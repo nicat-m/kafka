@@ -5,6 +5,7 @@
     - variables/env.yaml
   vars:
     ansible_ssh_pass: "{{ ssh_password }}"
+    ansible_become_pass: "{{ ssh_password }}"
   tasks:
     - name: Ensure curl is installed
       package:

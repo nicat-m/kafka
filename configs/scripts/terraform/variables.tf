@@ -48,12 +48,12 @@ variable "vm_template_name" {
 
 variable "vm_vcpu" {
   description = "The number of virtual processors to assign to this virtual machine."
-  default = "1"
+  default     = "1"
 }
 
 variable "vm_memory" {
   description = "The size of the virtual machine's memory in MB"
-  default = "1024"
+  default     = "1024"
 }
 
 variable "vm_ipv4_netmask" {
@@ -77,7 +77,7 @@ variable "vm_domain" {
 }
 
 variable "vms" {
-  type = map(any)
+  type        = map(any)
   description = "List of virtual machines to be deployed"
 }
 
@@ -95,32 +95,36 @@ variable "vm_disk_thin" {
 
 variable "kafka_config" {
   type = object({
-    kafka_version     = string
-    scala_version     = string
-    kafka_dir         = string
-    kafka_cluster_id  = string
-    broker_port       = number
-    controller_port   = number
-    sasl_username     = string
-    sasl_password     = string
-    keystore_pass     = string
-    key_pass          = string
-    truststore_pass   = string
+    kafka_version    = string
+    scala_version    = string
+    kafka_dir        = string
+    kafka_cluster_id = string
+    broker_port      = number
+    controller_port  = number
+    sasl_username    = string
+    sasl_password    = string
+    keystore_pass    = string
+    key_pass         = string
+    truststore_pass  = string
+    client_password  = string
+    client_username  = string
+    kafka_topics     = list(string)
+    kafka_operations = list(string)
   })
 }
 
 variable "ssh_password" {
-  type = string
+  type      = string
   sensitive = true
 }
 
 variable "ansible_config" {
   type = object({
-    become              = bool
-    become_ask_pass     = bool
-    become_method       = string
-    become_user         = string
-    host_key_checking   = bool
-    remote_user         = string
+    become            = bool
+    become_ask_pass   = bool
+    become_method     = string
+    become_user       = string
+    host_key_checking = bool
+    remote_user       = string
   })
 }

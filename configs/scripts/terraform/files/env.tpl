@@ -23,3 +23,18 @@ TRUSTSTORE_PASS: "${truststore_pass}"
 CERT_PATH: "${kafka_dir}/certs"
 SCRIPT_PATH: "${kafka_dir}/create-ssl.sh"
 JAAS_PATH: "${kafka_dir}/config/kafka-server-jaas.conf"
+
+## Creating new user and give ACL ENV
+HOSTNAME = "${kafka_broker_ip}"
+CLIENT_PASSWORD: "${client_password}"
+CLIENT_USERNAME: "${client_username}"
+CLIENT_CONFIG: "{{kafka_dir}}/config/client.properties"
+TOPICS:
+%{ for topic in kafka_topics ~}
+  - "${topic}"
+%{ endfor ~}
+
+OPERATIONS:
+%{ for op in kafka_operations ~}
+  - "${op}"
+%{ endfor ~}
