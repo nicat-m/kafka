@@ -8,6 +8,7 @@ USERNAME=
 CLIENT_CONFIG=$KAFKA_DIR/config/client.properties
 TOPICS=()
 OPERATIONS=()
+GROUP=()
 
 
 ##################################################################################################
@@ -61,9 +62,12 @@ done
 
 # Consumer group access for users
 
-bin/kafka-acls.sh --bootstrap-server $HOSTNAME:9092 \
---add --allow-principal User:$USERNAME --operation Read \
---group rest-api-group --command-config $CLIENT_CONFIG
+for groups in ${GROUP[@]}
+do
+    bin/kafka-acls.sh --bootstrap-server $HOSTNAME:9092 \
+    --add --allow-principal User:$USERNAME --operation Read \
+    --group $groups --command-config $CLIENT_CONFIG
 
-echo "INFO: Read access given for $USERNAME user in rest-api-group"
-echo ""
+    echo "INFO: Read access given for $USERNAME user in $groups"
+    echo ""
+done
