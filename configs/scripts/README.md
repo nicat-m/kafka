@@ -1,6 +1,8 @@
 ![Logo](../../images/terra-ansible-kafka.png)
 
-## Automatic Installation with ansible
+## Automatic Installation with terraform
+
+### This terraform code provide new virtual machine in VSphere Vcenter and install kafka with sasl or plaintext which you want
 
 ### Terraform Structure
             ├── terraform
@@ -13,50 +15,81 @@
             │      │      ├── inventory.tpl
             │      │      ├── secret.tpl
 
-### 1. Install ansible on your management server
+### 1. Install terraform and ansible on your management server
 ```
 # Debian
+
+# Install Terraform
+
+sudo apt-get update && sudo apt-get install -y gnupg software-properties-common
+
+wget -O- https://apt.releases.hashicorp.com/gpg | \
+gpg --dearmor | \
+sudo tee /usr/share/keyrings/hashicorp-archive-keyring.gpg > /dev/null
+
+gpg --no-default-keyring \
+--keyring /usr/share/keyrings/hashicorp-archive-keyring.gpg \
+--fingerprint
+
+echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(grep -oP '(?<=UBUNTU_CODENAME=).*' /etc/os-release || lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/hashicorp.list
+
+sudo apt update
+
+sudo apt-get install terraform
+
+# Install Ansible
+
 sudo apt update
 sudo apt install software-properties-common
 sudo add-apt-repository --yes --update ppa:ansible/ansible
 sudo apt install ansible -y
 
 # RHEL
+
+# Install Terraform
+
+sudo yum install -y yum-utils
+
+sudo yum-config-manager --add-repo https://rpm.releases.hashicorp.com/RHEL/hashicorp.repo
+
+sudo yum -y install terraform
+
+# Install Ansible
+
 sudo dnf install ansible -y
 ```
 
-### 2. Set some kafka variables ans ssh password under variables folder
+### 2. Set kafka variables in terraform.tfvars
 ```
 # for variables
-vim variables/env.yaml
 
-# for ssh_password
-
-vim variables/secret.yaml
-
-# set your hosts
-
-vim inventory
+vim terraform.tfvars
 ```
 
 ### 3. Let's get start:
 
 ```
-# Install kafka 
+# Edit backend.tf file which you want to store terraform state file
 
-ansible-playbook kafka-install.yaml
+vim backend.tf
 
-# if you want to configure with plaintext mode you need to run this yaml:
+# Initialize and validate configs
 
-ansible-playbook kafka-configure-plaintext.yaml
+terraform init
 
-# if you want to configure with sasl_ssl mode you need to run this yaml:
+terraform validate
 
-# first of all you need to create "jks-files" folder under ansible for fetch jks files on your local machine or management servers
+# Create plan 
 
-mkdir jks-files
+terraform plan --out kafka-vms.plan
 
-ansible-playbook kafka-configure-sasl-ssl.yaml
+# if you want to configure with plaintext mode you need to run this command:
+
+terraform apply -var 'action=plaintext'
+
+# if you want to configure with sasl_ssl mode you need to run this command:
+
+terraform apply -var 'action=saslssl'
 ```
 
 ## Resources

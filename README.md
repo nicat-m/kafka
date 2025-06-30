@@ -13,13 +13,13 @@
     ├── README.md
     └── configs
         ├── scripts
-        │    ├── create-ssl.sh
         │    ├── ansible
         │          ├── ansible.cfg
         │          ├── inventory
         │          ├── kafka-install.yaml
         │          ├── kafka-configure-plaintext.yaml
         │          ├── kafka-configure-sasl-ssl.yaml
+        │          ├── acl-create-user.yaml
         │          ├── templates
         │          │      ├── kafka-server-jaas.conf.j2
         │          │      ├── server.properties.plaintext.j2
@@ -27,13 +27,18 @@
         │          │      ├── kafka.service.j2
         │          │      ├── client.properties.j2
         │          │      ├── create-ssl.sh.j2
+        │          │      ├── create-acl.sh.j2        
         │          ├── variables
-        │                 ├── env.yaml
-        │                 ├── secrets.yaml
-        ├── client.properties
-        ├── server-1.properties
-        ├── server-2.properties
-        └── server-3.properties
+        │    ├── terraform
+        │          ├── main.tf
+        │          ├── terraform.tfvars
+        │          ├── variables.tf
+        │          ├── backend.tf
+        │          ├── files
+        │          │      ├── ansible.tpl
+        │          │      ├── env.tpl
+        │          │      ├── secret.tpl
+        │          │      ├── inventory.tpl
 
 
 ## Resources

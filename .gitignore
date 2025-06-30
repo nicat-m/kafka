@@ -32,7 +32,7 @@ build/
 ### VS Code ###
 .vscode/
 
-### JKS FOLDER ###
+### JKS Files ###
 configs/scripts/ansible/jks-files/*.jks
 
 ### Terraform state files ###
