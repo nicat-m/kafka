@@ -1,24 +1,17 @@
-![Logo](../../images/ansible-kafka.png)
+![Logo](../../images/terra-ansible-kafka.png)
 
 ## Automatic Installation with ansible
 
-### Ansible Structure
-            ├── ansible
-                  ├── ansible.cfg
-                  ├── inventory
-                  ├── kafka-install.yaml
-                  ├── kafka-configure-plaintext.yaml
-                  ├── kafka-configure-sasl-ssl.yaml
-                  ├── templates
-                  │      ├── kafka-server-jaas.conf.j2
-                  │      ├── server.properties.plaintext.j2
-                  │      ├── server.properties.saslssl.j2
-                  │      ├── kafka.service.j2
-                  │      ├── client.properties.j2
-                  │      ├── create-ssl.sh.j2
-                  ├── variables
-                         ├── env.yaml
-                         ├── secrets.yaml
+### Terraform Structure
+            ├── terraform
+            │      ├── main.tf
+            │      ├── terraform.tfvars
+            │      ├── variables.tf
+            │      ├── files
+            │      │      ├── ansible.tpl
+            │      │      ├── env.tpl
+            │      │      ├── inventory.tpl
+            │      │      ├── secret.tpl
 
 ### 1. Install ansible on your management server
 ```

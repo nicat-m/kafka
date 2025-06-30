@@ -110,6 +110,7 @@ variable "kafka_config" {
     client_username  = string
     kafka_topics     = list(string)
     kafka_operations = list(string)
+    kafka_acl_groups = list(string)
   })
 }
 

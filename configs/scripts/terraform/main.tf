@@ -86,6 +86,7 @@ resource "local_file" "ansible_env_yaml" {
     client_username  = var.kafka_config.client_username
     kafka_operations = var.kafka_config.kafka_operations
     kafka_topics     = var.kafka_config.kafka_topics
+    kafka_acl_groups = var.kafka_config.kafka_acl_groups
     kafka_broker_ip  = values(var.vms)[0].vm_ip
   })
 }

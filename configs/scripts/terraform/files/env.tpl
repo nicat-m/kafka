@@ -38,3 +38,8 @@ OPERATIONS:
 %{ for op in kafka_operations ~}
   - "${op}"
 %{ endfor ~}
+
+GROUP:
+%{ for gr in kafka_acl_groups ~}
+  - "${gr}"
+%{ endfor ~}
