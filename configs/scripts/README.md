@@ -83,6 +83,8 @@ terraform validate
 
 terraform plan --out kafka-vms.plan
 
+# NOTICE: Default is Plaintext mode
+
 # if you want to configure with plaintext mode you need to run this command:
 
 terraform apply -var 'action=plaintext'

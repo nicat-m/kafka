@@ -129,3 +129,9 @@ variable "ansible_config" {
     remote_user       = string
   })
 }
+
+variable "action" {
+  type = string
+  default = "plaintext"
+  description = "Kafka provisioning action: saslssl or plaintext"
+}

@@ -130,7 +130,13 @@ resource "null_resource" "run_kafka_configure" {
   depends_on = [null_resource.run_kafka_install]
 
   provisioner "local-exec" {
-    command     = "ansible-playbook -i inventory.ini kafka-configure-sasl-ssl.yaml"
+    command     = <<EOT
+      if [ "${var.action}" = "plaintext"]; then
+         ansible-playbook -i inventory.ini kafka-configure-plaintext.yaml
+      else
+          ansible-playbook -i inventory.ini kafka-configure-sasl-ssl.yaml
+      fi
+    EOT
     working_dir = "../ansible"
   }
 }
