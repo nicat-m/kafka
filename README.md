@@ -3,40 +3,44 @@
 
 #### There are 2 types of installation and configure method if you want to deploy with terraform click "Automatic Installation" or click "Manual Installation"
 
-[Automatic Installation with Ansible](./configs/scripts/README.md)
+[Automatic Installation with Ansible](./automations/ansible/README.md)
 
-[Automatic Installation with Terraform](https://github.com/nicat-m/kafka/blob/kafka-with-terraform/configs/scripts/README.md)
+[Automatic Installation with Terraform](https://github.com/nicat-m/kafka/blob/kafka-with-terraform/automations/README.md)
 
-[Manual Installation](./configs/README.md)
+[Manual Installation](./automations/README.md)
 
 
 ## Repository Structure
     .
     ├── README.md
-    └── configs
+    └── automations
+        ├── README.md
         ├── scripts
         │    ├── create-ssl.sh
         │    ├── create-acl.sh
-        │    ├── ansible
-        │          ├── ansible.cfg
-        │          ├── inventory
-        │          ├── kafka-install.yaml
-        │          ├── kafka-configure-plaintext.yaml
-        │          ├── kafka-configure-sasl-ssl.yaml
-        │          ├── acl-create-user.yaml
-        │          ├── templates
-        │          │      ├── kafka-server-jaas.conf.j2
-        │          │      ├── server.properties.plaintext.j2
-        │          │      ├── server.properties.saslssl.j2
-        │          │      ├── kafka.service.j2
-        │          │      ├── client.properties.j2
-        │          │      ├── create-ssl.sh.j2
-        │          │      ├── create-acl.sh.j2
-        │          ├── variables
-        │                 ├── env.yaml
-        │                 ├── secrets.yaml
-        ├── client.properties
-        ├── server-1.properties
+        ├── ansible
+        │     ├── ansible.cfg
+        │     ├── inventory
+        │     ├── kafka-install.yaml
+        │     ├── kafka-configure-plaintext.yaml
+        │     ├── kafka-configure-sasl-ssl.yaml
+        │     ├── acl-create-user.yaml
+        │     ├── README.md
+        │     ├── templates
+        │     │      ├── kafka-server-jaas.conf.j2
+        │     │      ├── server.properties.plaintext.j2
+        │     │      ├── server.properties.saslssl.j2
+        │     │      ├── kafka.service.j2
+        │     │      ├── client.properties.j2
+        │     │      ├── create-ssl.sh.j2
+        │     │      ├── create-acl.sh.j2
+        │     ├── variables
+        │            ├── env.yaml
+        │            ├── secrets.yaml
+        ├── configs
+        │     ├──client.properties
+        │     ├── server.properties
+        │     ├── kafka-server-jaas.conf
 
 
 ## Resources
