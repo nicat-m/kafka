@@ -3,43 +3,44 @@
 
 #### There are 2 types of installation and configure method if you want to deploy with terraform click "Automatic Installation" or click "Manual Installation"
 
-[Automatic Installation](./configs/scripts/README.md)
+[Automatic Installation with Ansible](https://github.com/nicat-m/kafka/blob/main/automations/ansible/README.md)
 
-[Manual Installation](./configs/README.md)
+[Automatic Installation with Terraform](./automations/README.md)
 
+[Manual Installation](https://github.com/nicat-m/kafka/blob/main/automations/README.md)
 
 ## Repository Structure
     .
     ├── README.md
-    └── configs
-        ├── scripts
-        │    ├── ansible
-        │          ├── ansible.cfg
-        │          ├── inventory
-        │          ├── kafka-install.yaml
-        │          ├── kafka-configure-plaintext.yaml
-        │          ├── kafka-configure-sasl-ssl.yaml
-        │          ├── acl-create-user.yaml
-        │          ├── templates
-        │          │      ├── kafka-server-jaas.conf.j2
-        │          │      ├── server.properties.plaintext.j2
-        │          │      ├── server.properties.saslssl.j2
-        │          │      ├── kafka.service.j2
-        │          │      ├── client.properties.j2
-        │          │      ├── create-ssl.sh.j2
-        │          │      ├── create-acl.sh.j2        
-        │          ├── variables
-        │    ├── terraform
-        │          ├── main.tf
-        │          ├── terraform.tfvars
-        │          ├── variables.tf
-        │          ├── backend.tf
-        │          ├── output.tf
-        │          ├── files
-        │          │      ├── ansible.tpl
-        │          │      ├── env.tpl
-        │          │      ├── secret.tpl
-        │          │      ├── inventory.tpl
+    └── automations
+        ├── README.md    
+        ├── ansible
+        │      ├── ansible.cfg
+        │      ├── inventory
+        │      ├── kafka-install.yaml
+        │      ├── kafka-configure-plaintext.yaml
+        │      ├── kafka-configure-sasl-ssl.yaml
+        │      ├── acl-create-user.yaml
+        │      ├── templates
+        │      │      ├── kafka-server-jaas.conf.j2
+        │      │      ├── server.properties.plaintext.j2
+        │      │      ├── server.properties.saslssl.j2
+        │      │      ├── kafka.service.j2
+        │      │      ├── client.properties.j2
+        │      │      ├── create-ssl.sh.j2
+        │      │      ├── create-acl.sh.j2        
+        │      ├── variables
+        ├── terraform
+        │      ├── main.tf
+        │      ├── terraform.tfvars
+        │      ├── variables.tf
+        │      ├── backend.tf
+        │      ├── output.tf
+        │      ├── files
+        │      │      ├── ansible.tpl
+        │      │      ├── env.tpl
+        │      │      ├── secret.tpl
+        │      │      ├── inventory.tpl
 
 
 ## Resources
