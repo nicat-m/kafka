@@ -9,6 +9,8 @@
             │      ├── main.tf
             │      ├── terraform.tfvars
             │      ├── variables.tf
+            │      ├── backend.tf
+            │      ├── output.tf
             │      ├── files
             │      │      ├── ansible.tpl
             │      │      ├── env.tpl
