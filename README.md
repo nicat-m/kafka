@@ -3,7 +3,9 @@
 
 #### There are 2 types of installation and configure method if you want to deploy with terraform click "Automatic Installation" or click "Manual Installation"
 
-[Automatic Installation](./configs/scripts/README.md)
+[Automatic Installation with Ansible](./configs/scripts/README.md)
+
+[Automatic Installation with Terraform](https://github.com/nicat-m/kafka/blob/kafka-with-terraform/configs/scripts/README.md)
 
 [Manual Installation](./configs/README.md)
 
