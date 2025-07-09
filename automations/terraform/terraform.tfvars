@@ -65,7 +65,7 @@ kafka_config = {
   kafka_acl_groups = ["rest-api-group"]
 }
 
-ssh_password = "Linux@nm!"
+ssh_password = ""
 
 ## Ansible config env
 
