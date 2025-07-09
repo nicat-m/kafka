@@ -15,7 +15,7 @@ CLIENT_PORT: ${client_port}
 SASL_USERNAME: "${sasl_username}"
 SASL_PASSWORD: "${sasl_password}"
 
-KEYSTORE_PATH: "${kafka_dir}/certs/{{inventory_hostname}}.keystore.jks"
+KEYSTORE_PATH: "${kafka_dir}/certs/{{ansible_hostname}}.keystore.jks"
 KEYSTORE_PASS: "${keystore_pass}"
 KEY_PASS: "${key_pass}"
 TRUSTSTORE_PATH: "${kafka_dir}/certs/kafka.truststore.jks"

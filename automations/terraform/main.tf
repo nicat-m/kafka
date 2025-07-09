@@ -114,13 +114,13 @@ resource "local_file" "ansible_config" {
   })
 }
 
-resource "time_sleep" "wait_30_seconds" {
+resource "time_sleep" "wait_60_seconds" {
   depends_on      = [vsphere_virtual_machine.kafka_hosts]
-  create_duration = "30s"
+  create_duration = "60s"
 }
 
 resource "null_resource" "run_kafka_install" {
-  depends_on = [time_sleep.wait_30_seconds]
+  depends_on = [time_sleep.wait_60_seconds]
 
   provisioner "local-exec" {
     command     = "ansible-playbook kafka-install.yaml"
