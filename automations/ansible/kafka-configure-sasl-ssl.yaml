@@ -117,8 +117,8 @@
 
     - name: Copy Keystore JKS files from local to each broker
       copy:
-        src: "jks-files/{{ inventory_hostname }}.keystore.jks"
-        dest: "/opt/kafka/certs/{{ inventory_hostname }}.keystore.jks"
+        src: "jks-files/{{ ansible_hostname }}.keystore.jks"
+        dest: "/opt/kafka/certs/{{ ansible_hostname }}.keystore.jks"
         mode: "0600"
       when: inventory_hostname != groups['brokers'][0]
 
@@ -158,6 +158,7 @@
     - name: Get Kafka Cluster Status
       shell: "{{ KAFKA_DIR }}/bin/kafka-metadata-quorum.sh --bootstrap-server {{ inventory_hostname }}:{{ CLIENT_PORT }} --command-config {{ KAFKA_DIR }}/config/client.properties describe --status"
       register: kafka_cluster_output
+      when: inventory_hostname == groups['brokers'][0]
 
     - name: Show Kafka Cluster Status
       debug:

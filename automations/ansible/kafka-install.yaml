@@ -61,10 +61,19 @@
         state: absent
       when: not kafka_installed.stat.exists
 
+    # - name: Set hostname in /etc/hosts file
+    #   lineinfile:
+    #     path: /etc/hosts
+    #     line: "{{ hostvars[item]['ansible_facts']['default_ipv4']['address'] }} {{ item }}"
+    #     state: present
+    #   loop: "{{ groups['all'] }}"
+    #   when: not kafka_installed.stat.exists
+  
     - name: Set hostname in /etc/hosts file
       lineinfile:
         path: /etc/hosts
-        line: "{{ hostvars[item]['ansible_facts']['default_ipv4']['address'] }} {{ item }}"
+        line: "{{ hostvars[item]['ansible_facts']['default_ipv4']['address'] }} {{ hostvars[item]['ansible_hostname'] }}"
         state: present
       loop: "{{ groups['all'] }}"
       when: not kafka_installed.stat.exists
+

@@ -15,7 +15,7 @@ CA_CERT="$CERT_DIR/ca.cert"
 CA_KEY="$CERT_DIR/ca.key"
 mkdir -p "$CERT_DIR"
 
-BROKERS=({% for host in groups['all'] %}"{{ hostvars[host]['inventory_hostname'] }}"{% if not loop.last %} {% endif %}{% endfor %})
+BROKERS=({% for host in groups['all'] %}"{{ hostvars[host]['ansible_hostname'] }}"{% if not loop.last %} {% endif %}{% endfor %})
 
 echo "[+] Creating CA-ROOT Certificate..."
 openssl req -new -x509 -keyout "$CA_KEY" -out "$CA_CERT" -days "$VALIDITY" -passout pass:$KEY_PASS -subj "/CN=Kafka-CA"
