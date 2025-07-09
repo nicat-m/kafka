@@ -1,5 +1,5 @@
 - name: Kafka SASL_SSL Configuration
-  hosts: all_nodes
+  hosts: all
   vars_files:
     - variables/secrets.yaml
     - variables/env.yaml

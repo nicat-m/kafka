@@ -101,6 +101,7 @@ variable "kafka_config" {
     kafka_cluster_id = string
     broker_port      = number
     controller_port  = number
+    client_port      = number
     sasl_username    = string
     sasl_password    = string
     keystore_pass    = string

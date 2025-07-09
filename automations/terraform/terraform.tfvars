@@ -1,5 +1,5 @@
 #Infrastructure
-vsphere_datacenter = "Non_VxRail_Datacenter"
+vsphere_datacenter      = "Non_VxRail_Datacenter"
 #vsphere_host           = "10.122.22.7"
 vsphere_compute_cluster = "Non_VxRail_Cluster"
 vsphere_datastore       = "DC2_E590H_02_dev_Test"
@@ -50,8 +50,9 @@ kafka_config = {
   scala_version    = "2.13"
   kafka_dir        = "/opt/kafka"
   kafka_cluster_id = "kafkademo"
-  broker_port      = 9092
+  broker_port      = 9094
   controller_port  = 9093
+  client_port      = 9092
   sasl_username    = "admin"
   sasl_password    = "adminpass"
   keystore_pass    = "123456"
@@ -64,7 +65,7 @@ kafka_config = {
   kafka_acl_groups = ["rest-api-group"]
 }
 
-ssh_password = ""
+ssh_password = "Linux@nm!"
 
 ## Ansible config env
 

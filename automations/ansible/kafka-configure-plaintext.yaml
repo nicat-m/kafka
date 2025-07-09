@@ -1,5 +1,5 @@
 - name: Kafka Plaintext Configuration
-  hosts: all_nodes
+  hosts: all
   vars_files:
     - variables/secrets.yaml
     - variables/env.yaml
@@ -38,7 +38,7 @@
 
     - name: Get Kafka Cluster Status
       shell: "{{ KAFKA_DIR }}/bin/kafka-metadata-quorum.sh --bootstrap-controller {{ inventory_hostname }}:{{ CONTROLLER_PORT }} describe --status"
-      when: ('controller' in group_names)
+      when: inventory_hostname == groups['brokers'][0]
       register: kafka_cluster_output
 
     - name: Show Kafka Cluster Status

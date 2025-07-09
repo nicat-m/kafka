@@ -77,6 +77,7 @@ resource "local_file" "ansible_env_yaml" {
     kafka_cluster_id = var.kafka_config.kafka_cluster_id
     broker_port      = var.kafka_config.broker_port
     controller_port  = var.kafka_config.controller_port
+    client_port      = var.kafka_config.client_port
     sasl_username    = var.kafka_config.sasl_username
     sasl_password    = var.kafka_config.sasl_password
     keystore_pass    = var.kafka_config.keystore_pass
@@ -109,6 +110,7 @@ resource "local_file" "ansible_config" {
     become_user       = var.ansible_config.become_user
     host_key_checking = var.ansible_config.host_key_checking
     remote_user       = var.ansible_config.remote_user
+    inventory_path    = "inventory.ini"
   })
 }
 
@@ -121,7 +123,7 @@ resource "null_resource" "run_kafka_install" {
   depends_on = [time_sleep.wait_30_seconds]
 
   provisioner "local-exec" {
-    command     = "ansible-playbook -i inventory.ini kafka-install.yaml"
+    command     = "ansible-playbook kafka-install.yaml"
     working_dir = "../ansible"
   }
 }
@@ -130,15 +132,14 @@ resource "null_resource" "run_kafka_configure" {
   depends_on = [null_resource.run_kafka_install]
 
   provisioner "local-exec" {
-    command     = <<EOT
-      if [ "${var.action}" = "plaintext"]; then
-         ansible-playbook -i inventory.ini kafka-configure-plaintext.yaml
-      else
-          ansible-playbook -i inventory.ini kafka-configure-sasl-ssl.yaml
-      fi
-    EOT
+    command = "${var.action == "plaintext" ? local.plaintext : local.saslssl}"
     working_dir = "../ansible"
   }
+}
+
+locals {
+  plaintext = "ansible-playbook kafka-configure-plaintext.yaml"
+  saslssl   = "ansible-playbook kafka-configure-sasl-ssl.yaml"
 }
 
 #Resource

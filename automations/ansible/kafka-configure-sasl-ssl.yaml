@@ -1,5 +1,5 @@
 - name: Kafka SASL_SSL Configuration
-  hosts: all_nodes
+  hosts: all
   vars_files:
     - variables/secrets.yaml
     - variables/env.yaml
@@ -7,6 +7,14 @@
     ansible_ssh_pass: "{{ ssh_password }}"
     ansible_become_pass: "{{ ssh_password }}"
   tasks:
+
+    - name: Stop Firewalld
+      ansible.builtin.systemd:
+        state: stopped
+        name: firewalld
+        enabled: false
+      when: ansible_os_family == "RedHat"
+        
     - name: Copy server.properties file to kafka servers
       template:
         src: templates/server.properties.plaintext.j2
@@ -37,18 +45,19 @@
         seconds: 10
 
     - name: Get Kafka Cluster Status
-      shell: "{{ KAFKA_DIR }}/bin/kafka-metadata-quorum.sh --bootstrap-controller {{ inventory_hostname }}:{{ CONTROLLER_PORT }} describe --status"
-      when: ('controller' in group_names)
+      shell: "{{ KAFKA_DIR }}/bin/kafka-metadata-quorum.sh --bootstrap-server {{ inventory_hostname }}:{{ CLIENT_PORT }} describe --status"
+      when: inventory_hostname == groups['brokers'][0]
       register: kafka_cluster_output
 
     - name: Show Kafka Cluster Status
+      debug:
         var: kafka_cluster_output
 
     - name: Create SCRAM admin user
-      shell: "{{KAFKA_DIR}}/bin/kafka-configs.sh --bootstrap-server {{inventory_hostname}}:9092 --alter --add-config 'SCRAM-SHA-256=[iterations=4096,password={{SASL_PASSWORD}}]' --entity-type users --entity-name {{SASL_USERNAME}}"
+      shell: "{{KAFKA_DIR}}/bin/kafka-configs.sh --bootstrap-server {{inventory_hostname}}:{{ CLIENT_PORT }} --alter --add-config 'SCRAM-SHA-256=[iterations=4096,password={{SASL_PASSWORD}}]' --entity-type users --entity-name {{SASL_USERNAME}}"
       register: scram_output
-      when: ('controller' in group_names)
-
+      when: inventory_hostname == groups['brokers'][0]
+      
     - name: Show creating scram user output
       debug:
         var: scram_output
@@ -73,12 +82,12 @@
         src: templates/create-ssl.sh.j2
         dest: "{{ SCRIPT_PATH }}"
         mode: "0755"
-      when: ('controller' in group_names)
+      when: inventory_hostname == groups['brokers'][0]
 
     - name: Run script and create jks file for each brokers
       shell: bash "{{ SCRIPT_PATH }}"
       register: script_output
-      when: ('controller' in group_names)
+      when: inventory_hostname == groups['brokers'][0]
 
     - name: Show script result
       debug:
@@ -89,7 +98,7 @@
         paths: "{{KAFKA_DIR}}/certs"
         patterns: "*.jks"
       register: jks_files
-      when: ('controller' in group_names)
+      when: inventory_hostname == groups['brokers'][0]
 
     - name: Fetch all JKS files
       fetch:
@@ -97,28 +106,28 @@
         dest: "./jks-files/"
         flat: yes
       loop: "{{ jks_files.files }}"
-      when: ('controller' in group_names)
+      when: inventory_hostname == groups['brokers'][0]
 
     - name: Ensure /opt/kafka/certs directory exists
       file:
         path: /opt/kafka/certs
         state: directory
         mode: "0755"
-      when: ('brokers' in group_names)
+      when: inventory_hostname != groups['brokers'][0]
 
     - name: Copy Keystore JKS files from local to each broker
       copy:
         src: "jks-files/{{ inventory_hostname }}.keystore.jks"
         dest: "/opt/kafka/certs/{{ inventory_hostname }}.keystore.jks"
         mode: "0600"
-      when: ('brokers' in group_names)
+      when: inventory_hostname != groups['brokers'][0]
 
     - name: Copy Truststore JKS file from local to each broker
       copy:
         src: "jks-files/kafka.truststore.jks"
         dest: "/opt/kafka/certs/kafka.truststore.jks"
         mode: "0600"
-      when: ('brokers' in group_names)
+      when: inventory_hostname != groups['brokers'][0]
 
     - name: Copy JAAS config to all servers
       template:
@@ -147,8 +156,7 @@
         seconds: 10
 
     - name: Get Kafka Cluster Status
-      shell: "{{ KAFKA_DIR }}/bin/kafka-metadata-quorum.sh --bootstrap-controller {{ inventory_hostname }}:{{ CONTROLLER_PORT }} --command-config {{ KAFKA_DIR }}/config/client.properties describe --status"
-      when: ('controller' in group_names)
+      shell: "{{ KAFKA_DIR }}/bin/kafka-metadata-quorum.sh --bootstrap-server {{ inventory_hostname }}:{{ CLIENT_PORT }} --command-config {{ KAFKA_DIR }}/config/client.properties describe --status"
       register: kafka_cluster_output
 
     - name: Show Kafka Cluster Status
