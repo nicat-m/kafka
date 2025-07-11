@@ -89,6 +89,14 @@ resource "local_file" "ansible_env_yaml" {
     kafka_topics     = var.kafka_config.kafka_topics
     kafka_acl_groups = var.kafka_config.kafka_acl_groups
     kafka_broker_ip  = values(var.vms)[0].vm_ip
+
+    # Cert Config
+    org              = var.certificate_config.org
+    org_unit         = var.certificate_config.org_unit
+    common_name      = var.certificate_config.common_name
+    state_province   = var.certificate_config.state_province
+    locality         = var.certificate_config.locality
+    country          = var.certificate_config.country
   })
 }
 

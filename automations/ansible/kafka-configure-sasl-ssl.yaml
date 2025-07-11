@@ -151,9 +151,9 @@
         daemon_reload: true
         name: kafka
 
-    - name: Wait for 10 seconds for starting kafka cluster
+    - name: Wait for 20 seconds for starting kafka cluster
       pause:
-        seconds: 10
+        seconds: 20
 
     - name: Get Kafka Cluster Status
       shell: "{{ KAFKA_DIR }}/bin/kafka-metadata-quorum.sh --bootstrap-server {{ inventory_hostname }}:{{ CLIENT_PORT }} --command-config {{ KAFKA_DIR }}/config/client.properties describe --status"

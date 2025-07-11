@@ -136,3 +136,14 @@ variable "action" {
   default = "plaintext"
   description = "Kafka provisioning action: saslssl or plaintext"
 }
+
+variable "certificate_config" {
+  type = object({
+    org_unit        = string
+    org             = string
+    common_name     = string
+    locality        = string
+    state_province  = string
+    country         = string
+  })
+}

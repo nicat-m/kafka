@@ -77,3 +77,12 @@ ansible_config = {
   become_ask_pass   = false
   become_user       = "root"
 }
+
+certificate_config = {
+  common_name     = "kafka.demo.local"
+  country         = "AZ"
+  org             = "Company"
+  org_unit        = "IT"
+  state_province  = "Baku"
+  locality        = "Baku"
+}

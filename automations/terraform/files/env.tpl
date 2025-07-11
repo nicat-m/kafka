@@ -1,3 +1,5 @@
+# KAFKA ENV
+
 KAFKA_VERSION: "${kafka_version}"
 SCALA_VERSION: "${scala_version}"
 KAFKA_DIR: "${kafka_dir}"
@@ -15,6 +17,15 @@ CLIENT_PORT: ${client_port}
 SASL_USERNAME: "${sasl_username}"
 SASL_PASSWORD: "${sasl_password}"
 
+# Certificate ENV
+
+ORG_UNIT: ${org_unit}
+ORG: ${org}
+COMMON_NAME: ${common_name}
+LOCALITY: ${locality}
+STATE_PROVINCE: ${state_province}
+COUNTRY: ${country}
+
 KEYSTORE_PATH: "${kafka_dir}/certs/{{ansible_hostname}}.keystore.jks"
 KEYSTORE_PASS: "${keystore_pass}"
 KEY_PASS: "${key_pass}"
@@ -25,7 +36,8 @@ CERT_PATH: "${kafka_dir}/certs"
 SCRIPT_PATH: "${kafka_dir}/create-ssl.sh"
 JAAS_PATH: "${kafka_dir}/config/kafka-server-jaas.conf"
 
-## Creating new user and give ACL ENV
+# Creating new user and give ACL ENV
+
 HOSTNAME: "${kafka_broker_ip}"
 CLIENT_PASSWORD: "${client_password}"
 CLIENT_USERNAME: "${client_username}"
