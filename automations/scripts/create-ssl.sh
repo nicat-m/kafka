@@ -11,12 +11,20 @@ VALIDITY=365
 CERT_DIR="/opt/kafka/certs"
 CA_CERT="$CERT_DIR/ca.cert"
 CA_KEY="$CERT_DIR/ca.key"
+
+ORG_UNIT=IT
+ORG=Company
+COMMON_NAME=kafka.demo.local
+LOCALITY=Baku
+STATE_PROVINCE=Baku
+COUNTRY=AZ
+
 mkdir -p "$CERT_DIR"
 
 BROKERS=("broker.local" "broker2.local" "broker3.local")
 
 echo "[+] Creating CA-ROOT Certificate..."
-openssl req -new -x509 -keyout "$CA_KEY" -out "$CA_CERT" -days "$VALIDITY" -passout pass:$PASSWORD -subj "/CN=Kafka-CA"
+openssl req -new -x509 -keyout "$CA_KEY" -out "$CA_CERT" -days "$VALIDITY" -passout pass:$PASSWORD -subj "/CN=$COMMON_NAME"
 
 for broker in "${BROKERS[@]}"; do
   echo "[*] $broker preparing for this broker..."
@@ -28,7 +36,7 @@ for broker in "${BROKERS[@]}"; do
     -keystore "$CERT_DIR/$broker.keystore.jks" \
     -storepass "$PASSWORD" \
     -keypass "$PASSWORD" \
-    -dname "CN=$broker, OU=Kafka, O=Kafka, L=Baku, ST=Baku, C=AZ"
+    -dname "CN=$broker, OU=$ORG_UNIT, O=$ORG, L=$LOCALITY, ST=$STATE_PROVINCE, C=$COUNTRY"
 
   # Step 2: Creating CSR
   keytool -certreq \
