@@ -97,6 +97,7 @@ resource "local_file" "ansible_env_yaml" {
     state_province   = var.certificate_config.state_province
     locality         = var.certificate_config.locality
     country          = var.certificate_config.country
+    cert_validity    = var.certificate_config.cert_validity
   })
 }
 

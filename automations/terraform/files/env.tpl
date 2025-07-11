@@ -25,6 +25,7 @@ COMMON_NAME: ${common_name}
 LOCALITY: ${locality}
 STATE_PROVINCE: ${state_province}
 COUNTRY: ${country}
+VALIDITY: ${cert_validity}
 
 KEYSTORE_PATH: "${kafka_dir}/certs/{{ansible_hostname}}.keystore.jks"
 KEYSTORE_PASS: "${keystore_pass}"

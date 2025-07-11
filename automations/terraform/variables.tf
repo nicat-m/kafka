@@ -145,5 +145,6 @@ variable "certificate_config" {
     locality        = string
     state_province  = string
     country         = string
+    cert_validity   = number
   })
 }
