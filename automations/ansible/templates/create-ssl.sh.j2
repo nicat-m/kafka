@@ -5,8 +5,9 @@
 #!/bin/bash
 
 set -e
-# ENV
+########### ENV VARIABLES ###############
 
+dt=`date +%F`
 KEY_PASS={{KEY_PASS}}
 KEYSTORE_PASS={{KEYSTORE_PASS}}
 TURSTSTORE_PASS={{TRUSTSTORE_PASS}}
@@ -18,68 +19,88 @@ COMMON_NAME={{COMMON_NAME}}
 LOCALITY={{LOCALITY}}
 STATE_PROVINCE={{STATE_PROVINCE}}
 COUNTRY={{COUNTRY}}
-
-###################################
-
 CA_CERT="$CERT_DIR/ca.cert"
 CA_KEY="$CERT_DIR/ca.key"
+###################################
+
+
 mkdir -p "$CERT_DIR"
 
-BROKERS=({% for host in groups['all'] %}"{{ hostvars[host]['ansible_hostname'] }}"{% if not loop.last %} {% endif %}{% endfor %})
+create_certs(){
 
-echo "[+] Creating CA-ROOT Certificate..."
-openssl req -new -x509 -keyout "$CA_KEY" -out "$CA_CERT" -days "$VALIDITY" -passout pass:$KEY_PASS -subj "/CN=$COMMON_NAME"
+  BROKERS=({% for host in groups['all'] %}"{{ hostvars[host]['ansible_hostname'] }}"{% if not loop.last %} {% endif %}{% endfor %})
 
-for broker in "${BROKERS[@]}"; do
-  echo "[*] $broker preparing for this broker..."
+  echo "[+] Creating CA-ROOT Certificate..."
+  openssl req -new -x509 -keyout "$CA_KEY" -out "$CA_CERT" -days "$VALIDITY" -passout pass:$KEY_PASS -subj "/CN=$COMMON_NAME"
 
-  # Step 1: Creating Keystore
-  keytool -genkeypair \
-    -alias "$broker" \
-    -keyalg RSA \
-    -keystore "$CERT_DIR/$broker.keystore.jks" \
-    -storepass "$KEYSTORE_PASS" \
-    -keypass "$KEY_PASS" \
-    -dname "CN=$broker, OU=$ORG_UNIT, O=$ORG, L=$LOCALITY, ST=$STATE_PROVINCE, C=$COUNTRY"
+  for broker in "${BROKERS[@]}"; do
+    echo "[*] $broker preparing for this broker..."
 
-  # Step 2: Creating CSR
-  keytool -certreq \
-    -alias "$broker" \
-    -keystore "$CERT_DIR/$broker.keystore.jks" \
-    -file "$CERT_DIR/$broker.csr" \
-    -storepass "$KEYSTORE_PASS"
+    # Step 1: Creating Keystore
+    keytool -genkeypair \
+      -alias "$broker" \
+      -keyalg RSA \
+      -keystore "$CERT_DIR/$broker.keystore.jks" \
+      -storepass "$KEYSTORE_PASS" \
+      -keypass "$KEY_PASS" \
+      -validity $VALIDITY \
+      -dname "CN=$broker, OU=$ORG_UNIT, O=$ORG, L=$LOCALITY, ST=$STATE_PROVINCE, C=$COUNTRY"
 
-  # Step 3: Signing with CA
-  openssl x509 -req \
-    -CA "$CA_CERT" \
-    -CAkey "$CA_KEY" \
-    -in "$CERT_DIR/$broker.csr" \
-    -out "$CERT_DIR/$broker-signed.crt" \
-    -days "$VALIDITY" \
-    -CAcreateserial \
-    -passin pass:$KEY_PASS
+    # Step 2: Creating CSR
+    keytool -certreq \
+      -alias "$broker" \
+      -keystore "$CERT_DIR/$broker.keystore.jks" \
+      -file "$CERT_DIR/$broker.csr" \
+      -storepass "$KEYSTORE_PASS"
 
-  # Step 4: CA and signed cert importing to keystore
-  keytool -importcert \
-    -keystore "$CERT_DIR/$broker.keystore.jks" \
-    -alias CARoot \
-    -file "$CA_CERT" \
-    -storepass "$KEYSTORE_PASS" -noprompt
+    # Step 3: Signing with CA
+    openssl x509 -req \
+      -CA "$CA_CERT" \
+      -CAkey "$CA_KEY" \
+      -in "$CERT_DIR/$broker.csr" \
+      -out "$CERT_DIR/$broker-signed.crt" \
+      -days "$VALIDITY" \
+      -CAcreateserial \
+      -passin pass:$KEY_PASS
 
-  keytool -importcert \
-    -keystore "$CERT_DIR/$broker.keystore.jks" \
-    -alias "$broker" \
-    -file "$CERT_DIR/$broker-signed.crt" \
-    -storepass "$KEYSTORE_PASS"
+    # Step 4: CA and signed cert importing to keystore
+    keytool -importcert \
+      -keystore "$CERT_DIR/$broker.keystore.jks" \
+      -alias CARoot \
+      -file "$CA_CERT" \
+      -storepass "$KEYSTORE_PASS" -noprompt
 
-done
+    keytool -importcert \
+      -keystore "$CERT_DIR/$broker.keystore.jks" \
+      -alias "$broker" \
+      -file "$CERT_DIR/$broker-signed.crt" \
+      -storepass "$KEYSTORE_PASS"
 
-  # Step 5: Creating Truststore and import CA
-  keytool -importcert \
-    -keystore "$CERT_DIR/kafka.truststore.jks" \
-    -alias CARoot \
-    -file "$CA_CERT" \
-    -storepass "$TURSTSTORE_PASS" -noprompt
+  done
 
-echo ""
-echo "✅ All Certificate and JKS successfully created !!!"
+    # Step 5: Creating Truststore and import CA
+    keytool -importcert \
+      -keystore "$CERT_DIR/kafka.truststore.jks" \
+      -alias CARoot \
+      -file "$CA_CERT" \
+      -storepass "$TURSTSTORE_PASS" -noprompt
+
+  echo ""
+  echo "✅ INFO: $dt All Certificate and JKS successfully created !!!"
+}
+
+check_jks_files(){
+  if [[ -n $jks_files ]]
+  then
+    echo ".jks files is exists under $CERT_DIR"
+    echo "$jks_files"
+    echo "WARN: $dt Deleting old jks files..."
+    rm -rf $CERT_DIR/*
+    sleep 1
+    create_certs
+  else
+    create_certs
+  fi
+}
+
+check_jks_files
