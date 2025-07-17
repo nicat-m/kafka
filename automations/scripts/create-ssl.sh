@@ -8,7 +8,7 @@ set -e
 
 dt=`date +%F`
 PASSWORD="123456"
-CERT_DIR="/opt/kafka/certs-new"
+CERT_DIR="/opt/kafka/certs"
 CA_CERT="$CERT_DIR/ca.cert"
 CA_KEY="$CERT_DIR/ca.key"
 jks_files=$(find $CERT_DIR -maxdepth 1 -type f -name "*.jks")
@@ -19,7 +19,7 @@ COMMON_NAME=kafka.demo.local
 LOCALITY=Baku
 STATE_PROVINCE=Baku
 COUNTRY=AZ
-VALIDITY=365
+VALIDITY=3650
 
 mkdir -p "$CERT_DIR"
 
