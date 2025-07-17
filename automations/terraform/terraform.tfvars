@@ -85,5 +85,5 @@ certificate_config = {
   org_unit        = "IT"
   state_province  = "Baku"
   locality        = "Baku"
-  cert_validity   = 365
+  cert_validity   = 3650
 }
