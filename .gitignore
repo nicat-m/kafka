@@ -41,3 +41,4 @@ automations/terraform/terraform.tfstate
 automations/terraform/terraform.tfstate.backup
 automations/ansible/inventory.ini
 automations/terraform/*.plan
+*.tfvars
