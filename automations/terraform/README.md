@@ -1,5 +1,12 @@
 ### Terraform tfvars example:
 
+
+```
+# Create terraform.tfvars file in this path
+
+Copy this example tfvars content on your local file
+
+```
 ```
 #Infrastructure
 vsphere_datacenter      = ""
