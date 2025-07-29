@@ -76,10 +76,9 @@ variable "vm_domain" {
   description = "Domain name of virtual machine"
 }
 
-variable "vms" {
-  type        = map(any)
-  description = "List of virtual machines to be deployed"
-}
+# variable "vm_kafka_ips" {
+#   type = map(any)
+# }
 
 variable "vm_disk_label" {
   description = "Disk label of the created virtual machine"
@@ -91,6 +90,15 @@ variable "vm_disk_size" {
 
 variable "vm_disk_thin" {
   description = "Disk type of the created virtual machine , thin or thick"
+}
+
+variable "kafka_vm_hostname" {
+}
+
+variable "kafka_vm_count" {
+}
+
+variable "kafka_vm_cidr" {
 }
 
 variable "kafka_config" {

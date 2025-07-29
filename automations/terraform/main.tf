@@ -1,20 +1,3 @@
-terraform {
-  required_providers {
-    vsphere = {
-      source  = "hashicorp/vsphere"
-      version = "2.2.0"
-    }
-  }
-}
-
-#Provider settings
-provider "vsphere" {
-  user                 = var.vsphere_user
-  password             = var.vsphere_password
-  vsphere_server       = var.vsphere_vcenter
-  allow_unverified_ssl = true
-}
-
 #Data sources
 
 data "vsphere_datacenter" "dc" {
@@ -53,17 +36,17 @@ data "vsphere_resource_pool" "pool" {
 
 # Ansible Kafka
 
-locals {
-  broker_ips = [
-    for vm in values(var.vms) : vm.vm_ip
-  ]
-}
+# locals {
+#   broker_ips = [
+#     values(var.vm_kafka_ips)
+#   ]
+# }
 
 resource "local_file" "ansible_inventory" {
   filename = "../ansible/inventory.ini"
 
   content = templatefile("${path.module}/files/inventory.tpl", {
-    broker_ips = local.broker_ips
+    broker_ips = local.kafka_ip_range
   })
 }
 
@@ -88,7 +71,7 @@ resource "local_file" "ansible_env_yaml" {
     kafka_operations = var.kafka_config.kafka_operations
     kafka_topics     = var.kafka_config.kafka_topics
     kafka_acl_groups = var.kafka_config.kafka_acl_groups
-    kafka_broker_ip  = values(var.vms)[0].vm_ip
+    kafka_broker_ip  = local.kafka_ip_range[0]
 
     # Cert Config
     org              = var.certificate_config.org
@@ -151,9 +134,10 @@ locals {
   saslssl   = "ansible-playbook kafka-configure-sasl-ssl.yaml"
 }
 
-#Resource
+# Create Virtual machine
+
 resource "vsphere_virtual_machine" "kafka_hosts" {
-  for_each = var.vms
+  count            = var.kafka_vm_count
 
   datastore_id     = data.vsphere_datastore.datastore.id
   resource_pool_id = data.vsphere_resource_pool.pool.id
@@ -164,7 +148,7 @@ resource "vsphere_virtual_machine" "kafka_hosts" {
     adapter_type = data.vsphere_virtual_machine.template.network_interface_types[0]
   }
 
-  name = each.value.name
+  name = "${var.kafka_vm_hostname}-${count.index + 1}"
 
   num_cpus = var.vm_vcpu
   memory   = var.vm_memory
@@ -179,11 +163,11 @@ resource "vsphere_virtual_machine" "kafka_hosts" {
     template_uuid = data.vsphere_virtual_machine.template.id
     customize {
       linux_options {
-        host_name = each.value.name
+        host_name = "${var.kafka_vm_hostname}-${count.index + 1}"
         domain    = var.vm_domain
       }
       network_interface {
-        ipv4_address = each.value.vm_ip
+        ipv4_address = local.kafka_ip_range[count.index]
         ipv4_netmask = var.vm_ipv4_netmask
 
       }
@@ -192,6 +176,5 @@ resource "vsphere_virtual_machine" "kafka_hosts" {
       dns_server_list = var.vm_dns_servers
     }
   }
-
 }
 
