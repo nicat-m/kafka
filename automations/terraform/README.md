@@ -14,6 +14,9 @@ vsphere_compute_cluster = ""
 vsphere_datastore       = ""
 vsphere_network         = ""
 vsphere_resource_pool   = ""
+vsphere_user            = ""
+vsphere_password        = ""
+vsphere_vcenter         = ""
 
 
 #VM
