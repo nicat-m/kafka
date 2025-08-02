@@ -101,6 +101,14 @@ variable "kafka_vm_count" {
 variable "kafka_vm_cidr" {
 }
 
+variable "kafka_vm_start_ip" {
+  
+}
+
+variable "kafka_vm_end_ip" {
+  
+}
+
 variable "kafka_config" {
   type = object({
     kafka_version    = string

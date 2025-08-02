@@ -1,5 +1,5 @@
 locals {
   kafka_ip_range = [
-    for i in range(1, var.kafka_vm_count + 1) : cidrhost(var.kafka_vm_cidr, i)
+    for i in range(var.kafka_vm_start_ip, var.kafka_vm_end_ip) : cidrhost(var.kafka_vm_cidr, i)
   ]
 }
