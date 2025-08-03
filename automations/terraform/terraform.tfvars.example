@@ -1,0 +1,71 @@
+#Infrastructure
+vsphere_datacenter = ""
+vsphere_compute_cluster = ""
+vsphere_datastore = ""
+vsphere_network = ""
+vsphere_resource_pool = ""
+vsphere_user = ""
+vsphere_password = ""
+vsphere_vcenter = ""
+
+#VM
+vm_template_name = ""
+vm_vcpu = ""
+vm_memory = ""
+vm_ipv4_netmask = ""
+vm_ipv4_gateway = ""
+vm_dns_servers = ""
+dns_suffix_list = ""
+vm_disk_label = ""
+vm_disk_size = ""
+vm_disk_thin = ""
+vm_domain = ""
+kafka_vm_hostname = ""
+kafka_vm_count = ""
+kafka_vm_cidr = ""
+kafka_vm_start_ip = ""
+kafka_vm_end_ip = ""
+
+## Kafka ENV
+
+kafka_config = ""
+kafka_version = ""
+scala_version = ""
+kafka_dir = ""
+kafka_cluster_id = ""
+broker_port = ""
+controller_port = ""
+client_port = ""
+sasl_username = ""
+sasl_password = ""
+keystore_pass = ""
+key_pass = ""
+truststore_pass = ""
+client_password = ""
+client_username = ""
+kafka_operations = ""
+kafka_topics = ""
+kafka_acl_groups = ""
+}
+
+ssh_password = ""
+
+## Ansible config env
+
+ansible_config = ""
+become = ""
+host_key_checking = ""
+remote_user = ""
+become_method = ""
+become_ask_pass = ""
+become_user = ""
+}
+
+certificate_config = ""
+common_name = ""
+country = ""
+org = ""
+org_unit = ""
+state_province = ""
+locality = ""
+cert_validity = ""
