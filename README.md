@@ -29,13 +29,14 @@
         │      │      ├── client.properties.j2
         │      │      ├── create-ssl.sh.j2
         │      │      ├── create-acl.sh.j2        
-        │      ├── variables
         ├── terraform
         │      ├── main.tf
         │      ├── terraform.tfvars
         │      ├── variables.tf
-        │      ├── backend.tf
+        │      ├── terraform.tf
         │      ├── output.tf
+        │      ├── locals.tf
+        │      ├── terraform.tfvars.example
         │      ├── files
         │      │      ├── ansible.tpl
         │      │      ├── env.tpl
