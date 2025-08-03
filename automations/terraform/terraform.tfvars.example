@@ -1,4 +1,4 @@
-#Infrastructure
+# Infrastructure
 vsphere_datacenter = ""
 vsphere_compute_cluster = ""
 vsphere_datastore = ""
@@ -8,7 +8,7 @@ vsphere_user = ""
 vsphere_password = ""
 vsphere_vcenter = ""
 
-#VM
+# VM
 vm_template_name = ""
 vm_vcpu = ""
 vm_memory = ""
@@ -26,8 +26,7 @@ kafka_vm_cidr = ""
 kafka_vm_start_ip = ""
 kafka_vm_end_ip = ""
 
-## Kafka ENV
-
+# Kafka ENV
 kafka_config = ""
 kafka_version = ""
 scala_version = ""
@@ -48,10 +47,10 @@ kafka_topics = ""
 kafka_acl_groups = ""
 }
 
+# SSH Password
 ssh_password = ""
 
-## Ansible config env
-
+# Ansible config env
 ansible_config = ""
 become = ""
 host_key_checking = ""
@@ -61,6 +60,7 @@ become_ask_pass = ""
 become_user = ""
 }
 
+# Certificate env
 certificate_config = ""
 common_name = ""
 country = ""
