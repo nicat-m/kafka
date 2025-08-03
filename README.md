@@ -31,7 +31,6 @@
         │      │      ├── create-acl.sh.j2        
         ├── terraform
         │      ├── main.tf
-        │      ├── terraform.tfvars
         │      ├── variables.tf
         │      ├── terraform.tf
         │      ├── output.tf
