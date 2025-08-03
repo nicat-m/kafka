@@ -50,6 +50,7 @@ resource "local_file" "ansible_inventory" {
   })
 }
 
+
 resource "local_file" "ansible_env_yaml" {
   filename = "../ansible/variables/env.yaml"
 
@@ -120,8 +121,16 @@ resource "null_resource" "run_kafka_install" {
   }
 }
 
+resource "null_resource" "create_jks_folder" {
+  provisioner "local-exec" {
+    command = "mkdir ../ansible/jks-files"
+  }
+  depends_on = [ null_resource.run_kafka_install ]
+  
+}
+
 resource "null_resource" "run_kafka_configure" {
-  depends_on = [null_resource.run_kafka_install]
+  depends_on = [null_resource.run_kafka_install,null_resource.create_jks_folder]
 
   provisioner "local-exec" {
     command = "${var.action == "plaintext" ? local.plaintext : local.saslssl}"
