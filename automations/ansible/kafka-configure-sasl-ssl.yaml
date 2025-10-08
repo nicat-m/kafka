@@ -117,8 +117,8 @@
 
     - name: Copy Keystore JKS files from local to each broker
       copy:
-        src: "jks-files/{{ inventory_hostname }}.keystore.jks"
-        dest: "/opt/kafka/certs/{{ inventory_hostname }}.keystore.jks"
+        src: "jks-files/{{ ansible_hostname }}.keystore.jks"
+        dest: "/opt/kafka/certs/{{ ansible_hostname }}.keystore.jks"
         mode: "0600"
       when: inventory_hostname != groups['brokers'][0]
 
