@@ -39,6 +39,7 @@
         state: restarted
         daemon_reload: true
         name: kafka
+        enabled: true
 
     - name: Wait for 10 seconds for starting kafka cluster
       pause:
