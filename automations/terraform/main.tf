@@ -136,7 +136,7 @@ resource "null_resource" "run_kafka_configure" {
   depends_on = [null_resource.run_kafka_install, null_resource.create_jks_folder]
 
   provisioner "local-exec" {
-    command     = var.action == "plaintext" ? local.plaintext : local.saslssl
+    command     = var.action == "plaintext" ? local.plaintext : var.action == "saslssl" ? local.saslssl : local.ssl
     working_dir = "../ansible"
   }
 }
@@ -144,6 +144,7 @@ resource "null_resource" "run_kafka_configure" {
 locals {
   plaintext = "ansible-playbook kafka-configure-plaintext.yaml"
   saslssl   = "ansible-playbook kafka-configure-sasl-ssl.yaml"
+  ssl       = "ansible-playbook kafka-configure-ssl.yaml"
 }
 
 # Create Virtual machine
