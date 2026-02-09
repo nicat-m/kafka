@@ -34,3 +34,4 @@ build/
 
 ### JKS FOLDER ###
 automations/ansible/jks-files/*.jks
+automations/ansible/jks-files/*.pem
