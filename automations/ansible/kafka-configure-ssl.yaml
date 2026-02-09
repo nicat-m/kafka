@@ -1,0 +1,190 @@
+- name: Kafka SSL Configuration
+  hosts: all
+  vars_files:
+    - variables/secrets.yaml
+    - variables/env.yaml
+  vars:
+    ansible_ssh_pass: "{{ ssh_password }}"
+    ansible_become_pass: "{{ ssh_password }}"
+  tasks:
+
+    - name: Stop Firewalld
+      ansible.builtin.systemd:
+        state: stopped
+        name: firewalld
+        enabled: false
+      when: ansible_os_family == "RedHat"
+        
+    - name: Copy server.properties file to kafka servers
+      template:
+        src: templates/server.properties.plaintext.j2
+        dest: "{{ KAFKA_SERVER_CONFIG }}"
+
+    - name: Copy kafka.service systemd file to servers
+      template:
+        src: templates/kafka.service.j2
+        dest: "{{ KAFKA_SERVICE_PATH }}"
+
+    - name: Set Kafka node.id
+      lineinfile:
+        path: /opt/kafka/config/server.properties
+        regexp: "^node.id="
+        line: "node.id={{ node_id }}"
+
+    - name: Generate Log Storage
+      shell: "{{ KAFKA_DIR }}/bin/kafka-storage.sh format -t {{ KAFKA_CLUSTER_ID }} -c {{ KAFKA_SERVER_CONFIG }}"
+
+    - name: Restart service kafka also issue daemon-reload to pick up config changes
+      ansible.builtin.systemd_service:
+        state: restarted
+        daemon_reload: true
+        name: kafka
+
+    - name: Wait for 10 seconds for starting kafka cluster
+      pause:
+        seconds: 10
+
+    - name: Get Kafka Cluster Status
+      shell: "{{ KAFKA_DIR }}/bin/kafka-metadata-quorum.sh --bootstrap-server {{ inventory_hostname }}:{{ CLIENT_PORT }} describe --status"
+      when: inventory_hostname == groups['brokers'][0]
+      register: kafka_cluster_output
+
+    - name: Show Kafka Cluster Status
+      debug:
+        var: kafka_cluster_output
+
+    - name: Stop service kafka in all hosts
+      ansible.builtin.systemd_service:
+        name: kafka
+        state: stopped
+
+    - name: Copy server.properties file to kafka servers 
+      template:
+        src: templates/server.properties.ssl.j2
+        dest: "{{ KAFKA_SERVER_CONFIG }}"
+
+    - name: Copy kafka.service systemd file to servers
+      template:
+        src: templates/kafka.service.j2
+        dest: "{{ KAFKA_SERVICE_PATH }}"
+
+    # Only run certificate generation/copying if NOT using PEM content injection
+    # If using PEM content injection, assume keys are already in vars
+    - block:
+      - name: Copy create-ssl.sh script to broker1
+        template:
+          src: templates/create-ssl.sh.j2
+          dest: "{{ SCRIPT_PATH }}"
+          mode: "0755"
+        when: inventory_hostname == groups['brokers'][0]
+
+      - name: Run script and create certificates file for each brokers
+        shell: bash "{{ SCRIPT_PATH }}"
+        register: script_output
+        when: inventory_hostname == groups['brokers'][0]
+
+      - name: Show script result
+        debug:
+          var: script_output
+
+      - name: Find all certificate files
+        find:
+          paths: "{{KAFKA_DIR}}/certs"
+          patterns: "*.jks"
+        register: jks_files
+        when: inventory_hostname == groups['brokers'][0] and SSL_KEYSTORE_TYPE == 'JKS'
+
+      - name: Fetch all JKS files
+        fetch:
+          src: "{{ item.path }}"
+          dest: "./jks-files/"
+          flat: yes
+        loop: "{{ jks_files.files }}"
+        when: inventory_hostname == groups['brokers'][0] and SSL_KEYSTORE_TYPE == 'JKS'
+
+      - name: Find all PEM certificates
+        find:
+          paths: "{{KAFKA_DIR}}/certs"
+          patterns: "*.pem"
+        register: pem_certs
+        when: inventory_hostname == groups['brokers'][0] and SSL_KEYSTORE_TYPE == 'PEM'
+
+      - name: Fetch all PEM certificates
+        fetch:
+          src: "{{ item.path }}"
+          dest: "./jks-files/"
+          flat: yes
+        loop: "{{ pem_certs.files }}"
+        when: inventory_hostname == groups['brokers'][0] and SSL_KEYSTORE_TYPE == 'PEM'
+
+      - name: Fetch root CA certificate
+        fetch:
+          src: "{{KAFKA_DIR}}/certs/ca.cert"
+          dest: "./jks-files/"
+          flat: yes
+        when: inventory_hostname == groups['brokers'][0] and SSL_KEYSTORE_TYPE == 'PEM'
+
+      - name: Ensure /opt/kafka/certs directory exists
+        file:
+          path: /opt/kafka/certs
+          state: directory
+          mode: "0755"
+        when: inventory_hostname != groups['brokers'][0]
+
+      - name: Copy Keystore JKS files from local to each broker
+        copy:
+          src: "jks-files/{{ ansible_hostname }}.keystore.jks"
+          dest: "/opt/kafka/certs/{{ ansible_hostname }}.keystore.jks"
+          mode: "0600"
+        when: inventory_hostname != groups['brokers'][0] and SSL_KEYSTORE_TYPE == 'JKS'
+
+      - name: Copy Truststore JKS file from local to each broker
+        copy:
+          src: "jks-files/kafka.truststore.jks"
+          dest: "/opt/kafka/certs/kafka.truststore.jks"
+          mode: "0600"
+        when: inventory_hostname != groups['brokers'][0] and SSL_KEYSTORE_TYPE == 'JKS'
+
+      - name: Copy PEM certificates to each broker
+        copy:
+          src: "jks-files/{{ ansible_hostname }}.pem"
+          dest: "/opt/kafka/certs/{{ ansible_hostname }}.pem"
+          mode: "0600"
+        when: inventory_hostname != groups['brokers'][0] and SSL_KEYSTORE_TYPE == 'PEM'
+
+      - name: Copy ca cert to each broker
+        copy:
+          src: "jks-files/ca.cert"
+          dest: "/opt/kafka/certs/ca.cert"
+          mode: "0600"
+        when: inventory_hostname != groups['brokers'][0] and SSL_KEYSTORE_TYPE == 'PEM'
+
+    - name: Copy client.properties to all servers
+      template:
+        src: templates/client.properties.ssl.j2
+        dest: "{{KAFKA_DIR}}/config/client.properties"
+
+    - name: Set Kafka node.id
+      lineinfile:
+        path: /opt/kafka/config/server.properties
+        regexp: "^node.id="
+        line: "node.id={{ node_id }}"
+
+    - name: Restart service kafka also issue daemon-reload to pick up config changes
+      ansible.builtin.systemd_service:
+        state: restarted
+        daemon_reload: true
+        name: kafka
+        enabled: true
+
+    - name: Wait for 10 seconds for starting kafka cluster
+      pause:
+        seconds: 10
+
+    - name: Get Kafka Cluster Status
+      shell: "{{ KAFKA_DIR }}/bin/kafka-metadata-quorum.sh --bootstrap-server {{ inventory_hostname }}:{{ CLIENT_PORT }} --command-config {{ KAFKA_DIR }}/config/client.properties describe --status"
+      register: kafka_cluster_output
+
+    - name: Show Kafka Cluster Status
+      debug:
+        var: kafka_cluster_output
