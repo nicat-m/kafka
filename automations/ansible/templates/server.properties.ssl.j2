@@ -3,7 +3,7 @@ process.roles=broker,controller
 node.id= {{ node_id }}
 KAFKA_CLUSTER_ID={{ KAFKA_CLUSTER_ID }}
 
-controller.quorum.voters={% if inventory_hostname == groups['all'][0] %}1@{{ hostvars[inventory_hostname]['inventory_hostname'] }}:{{ CONTROLLER_PORT }}{% else %}{% for host in groups['all'] %}{{ loop.index }}@{{ hostvars[host]['inventory_hostname'] }}:{{ CONTROLLER_PORT }}{% if not loop.last %},{% endif %}{% endfor %}{% endif %}
+controller.quorum.voters={% for host in groups['all'] %}{{ loop.index }}@{{ hostvars[host]['inventory_hostname'] }}:{{ CONTROLLER_PORT }}{% if not loop.last %},{% endif %}{% endfor %}
 
 controller.listener.names=CONTROLLER
 
@@ -11,7 +11,7 @@ socket.send.buffer.bytes=102400
 socket.receive.buffer.bytes=102400
 socket.request.max.bytes=104857600
 
-num.partitions=6
+num.partitions=12
 num.recovery.threads.per.data.dir=1
 num.network.threads=3
 num.io.threads=8
@@ -25,22 +25,43 @@ transaction.state.log.min.isr=1
 log.retention.hours=168
 log.segment.bytes=1073741824
 log.retention.check.interval.ms=300000
-log.dirs=/var/log/kraft-combined-logs
+log.dirs={{ KAFKA_LOG_DIR | default('/var/lib/kafka') }}
 
 # ACL
 authorizer.class.name=org.apache.kafka.metadata.authorizer.StandardAuthorizer
 allow.everyone.if.no.acl.found=false
-super.users=User:{{SSL_USERNAME}}
+super.users=User:ANONYMOUS;User:{{SSL_USER_DN}};User:broker
+
+ssl.principal.mapping.rules=RULE:^CN=.*$/broker/,\
+    RULE:^CN=([a-zA-Z0-9.\-]*),OU=(broker|admin)$/$2/,\
+    RULE:^CN=([a-zA-Z0-9.\-]*),OU=(client)$/$1@$2/,\
+    DEFAULT
 
 # Listeners
-inter.broker.listener.name=SSL
-listeners=SSL://{{ inventory_hostname }}:{{ BROKER_PORT }},CONTROLLER://{{ inventory_hostname }}:{{ CONTROLLER_PORT }}
-listener.security.protocol.map=SSL:SSL,CONTROLLER:SSL
-advertised.listeners=SSL://{{inventory_hostname}}:{{ BROKER_PORT }}
+inter.broker.listener.name=BROKER
+listeners=CLIENT://0.0.0.0:{{ CLIENT_PORT }},CONTROLLER://0.0.0.0:{{ CONTROLLER_PORT }},BROKER://0.0.0.0:{{ BROKER_PORT }}
+listener.security.protocol.map=CLIENT:SSL,CONTROLLER:SSL,BROKER:SSL
+advertised.listeners=BROKER://{{inventory_hostname}}:{{ BROKER_PORT }},CLIENT://{{ inventory_hostname }}:{{ CLIENT_PORT }}
 
-ssl.keystore.location={{KEYSTORE_PATH}}
-ssl.keystore.password={{KEYSTORE_PASS}}
-ssl.key.password={{KEY_PASS}}
-ssl.truststore.location={{TRUSTSTORE_PATH}}
-ssl.truststore.password={{TRUSTSTORE_PASS}}
+# SSL configuration
+ssl.client.auth=required
+
+# SSL Keystore Configuration
+ssl.keystore.type={{ SSL_KEYSTORE_TYPE | default('JKS') }}
+{% if SSL_KEYSTORE_TYPE == 'PEM' %}
+ssl.keystore.location={{ KEYSTORE_PATH }}/{{ansible_hostname}}.pem
+{% else %}
+ssl.keystore.location={{ KEYSTORE_PATH }}/{{ansible_hostname}}.keystore.jks
+ssl.keystore.password={{ KEYSTORE_PASS }}
+ssl.key.password={{ KEY_PASS }}
+{% endif %}
+
+# SSL Truststore Configuration
+ssl.truststore.type={{ SSL_TRUSTSTORE_TYPE | default('JKS') }}
+{% if SSL_TRUSTSTORE_TYPE == 'PEM' %}
+ssl.truststore.location={{ TRUSTSTORE_PATH }}/ca.cert
+{% else %}
+ssl.truststore.location={{ TRUSTSTORE_PATH }}/kafka.truststore.jks
+ssl.truststore.password={{ TRUSTSTORE_PASS }}
+{% endif %}
 ssl.endpoint.identification.algorithm=

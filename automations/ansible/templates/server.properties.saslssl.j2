@@ -25,7 +25,7 @@ transaction.state.log.min.isr=1
 log.retention.hours=168
 log.segment.bytes=1073741824
 log.retention.check.interval.ms=300000
-log.dirs=/var/log/kraft-combined-logs
+log.dirs={{ KAFKA_LOG_DIR | default('/var/lib/kafka') }}
 
 # ACL
 authorizer.class.name=org.apache.kafka.metadata.authorizer.StandardAuthorizer
@@ -43,9 +43,22 @@ advertised.listeners=BROKER://{{inventory_hostname}}:{{ BROKER_PORT }},CLIENT://
 sasl.enabled.mechanisms=SCRAM-SHA-256
 sasl.mechanism.inter.broker.protocol=SCRAM-SHA-256
 
-ssl.keystore.location={{KEYSTORE_PATH}}
-ssl.keystore.password={{KEYSTORE_PASS}}
-ssl.key.password={{KEY_PASS}}
-ssl.truststore.location={{TRUSTSTORE_PATH}}
-ssl.truststore.password={{TRUSTSTORE_PASS}}
+# SSL Keystore Configuration
+ssl.keystore.type={{ SSL_KEYSTORE_TYPE | default('JKS') }}
+{% if SSL_KEYSTORE_TYPE == 'PEM' %}
+ssl.keystore.location={{ KEYSTORE_PATH }}/{{ansible_hostname}}.pem
+{% else %}
+ssl.keystore.location={{ KEYSTORE_PATH }}/{{ansible_hostname}}.keystore.jks
+ssl.keystore.password={{ KEYSTORE_PASS }}
+ssl.key.password={{ KEY_PASS }}
+{% endif %}
+
+# SSL Truststore Configuration
+ssl.truststore.type={{ SSL_TRUSTSTORE_TYPE | default('JKS') }}
+{% if SSL_TRUSTSTORE_TYPE == 'PEM' %}
+ssl.truststore.location={{ TRUSTSTORE_PATH }}/ca.cert
+{% else %}
+ssl.truststore.location={{ TRUSTSTORE_PATH }}/kafka.truststore.jks
+ssl.truststore.password={{ TRUSTSTORE_PASS }}
+{% endif %}
 ssl.endpoint.identification.algorithm=

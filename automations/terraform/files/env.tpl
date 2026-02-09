@@ -8,6 +8,7 @@ KAFKA_URL: "https://downloads.apache.org/kafka/${kafka_version}/kafka_${scala_ve
 KAFKA_EXTRACT: "kafka_${scala_version}-${kafka_version}"
 KAFKA_SERVER_CONFIG: "${kafka_dir}/config/server.properties"
 KAFKA_SERVICE_PATH: "/etc/systemd/system/kafka.service"
+KAFKA_LOG_DIR: "/var/lib/kafka"
 
 KAFKA_CLUSTER_ID: "${kafka_cluster_id}"
 BROKER_PORT: ${broker_port}
@@ -27,11 +28,16 @@ STATE_PROVINCE: ${state_province}
 COUNTRY: ${country}
 VALIDITY: ${cert_validity}
 
-KEYSTORE_PATH: "${kafka_dir}/certs/{{ansible_hostname}}.keystore.jks"
+KEYSTORE_PATH: "${kafka_dir}/certs"
 KEYSTORE_PASS: "${keystore_pass}"
 KEY_PASS: "${key_pass}"
-TRUSTSTORE_PATH: "${kafka_dir}/certs/kafka.truststore.jks"
+TRUSTSTORE_PATH: "${kafka_dir}/certs"
 TRUSTSTORE_PASS: "${truststore_pass}"
+
+# SSL Type Configuration (JKS or PEM)
+SSL_KEYSTORE_TYPE: "${ssl_keystore_type}"
+SSL_TRUSTSTORE_TYPE: "${ssl_truststore_type}"
+SSL_USER_DN: "${ssl_user_dn}"
 
 CERT_PATH: "${kafka_dir}/certs"
 SCRIPT_PATH: "${kafka_dir}/create-ssl.sh"

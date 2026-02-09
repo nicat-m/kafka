@@ -128,6 +128,9 @@ variable "kafka_config" {
     kafka_topics     = list(string)
     kafka_operations = list(string)
     kafka_acl_groups = list(string)
+    ssl_keystore_type = string
+    ssl_truststore_type = string
+    ssl_user_dn = string
   })
 }
 
@@ -150,7 +153,7 @@ variable "ansible_config" {
 variable "action" {
   type = string
   default = "plaintext"
-  description = "Kafka provisioning action: saslssl or plaintext"
+  description = "Kafka provisioning action: saslssl, plaintext,ssl"
 }
 
 variable "certificate_config" {

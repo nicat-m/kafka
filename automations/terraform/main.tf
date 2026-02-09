@@ -82,6 +82,9 @@ resource "local_file" "ansible_env_yaml" {
     locality         = var.certificate_config.locality
     country          = var.certificate_config.country
     cert_validity    = var.certificate_config.cert_validity
+    ssl_keystore_type = var.kafka_config.ssl_keystore_type
+    ssl_truststore_type = var.kafka_config.ssl_truststore_type
+    ssl_user_dn = var.kafka_config.ssl_user_dn
   })
 }
 

@@ -69,3 +69,7 @@ org_unit = ""
 state_province = ""
 locality = ""
 cert_validity = ""
+ssl_keystore_type = ""
+ssl_truststore_type = ""
+ssl_user_dn = ""
+
