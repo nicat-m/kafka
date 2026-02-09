@@ -94,6 +94,10 @@ terraform apply -var 'action=plaintext'
 # if you want to configure with sasl_ssl mode you need to run this command:
 
 terraform apply -var 'action=saslssl'
+
+# if you want to configure with ssl mode you need to run this command:
+
+terraform apply -var 'action=ssl'
 ```
 
 ## Resources
