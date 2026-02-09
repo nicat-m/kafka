@@ -161,7 +161,7 @@
 
     - name: Copy client.properties to all servers
       template:
-        src: templates/client.properties.ssl.j2
+        src: templates/client.properties.j2
         dest: "{{KAFKA_DIR}}/config/client.properties"
 
     - name: Set Kafka node.id

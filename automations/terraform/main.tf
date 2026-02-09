@@ -75,16 +75,16 @@ resource "local_file" "ansible_env_yaml" {
     kafka_broker_ip  = local.kafka_ip_range[0]
 
     # Cert Config
-    org              = var.certificate_config.org
-    org_unit         = var.certificate_config.org_unit
-    common_name      = var.certificate_config.common_name
-    state_province   = var.certificate_config.state_province
-    locality         = var.certificate_config.locality
-    country          = var.certificate_config.country
-    cert_validity    = var.certificate_config.cert_validity
-    ssl_keystore_type = var.kafka_config.ssl_keystore_type
+    org                 = var.certificate_config.org
+    org_unit            = var.certificate_config.org_unit
+    common_name         = var.certificate_config.common_name
+    state_province      = var.certificate_config.state_province
+    locality            = var.certificate_config.locality
+    country             = var.certificate_config.country
+    cert_validity       = var.certificate_config.cert_validity
+    ssl_keystore_type   = var.kafka_config.ssl_keystore_type
     ssl_truststore_type = var.kafka_config.ssl_truststore_type
-    ssl_user_dn = var.kafka_config.ssl_user_dn
+    ssl_user_dn         = var.kafka_config.ssl_user_dn
   })
 }
 
@@ -128,15 +128,15 @@ resource "null_resource" "create_jks_folder" {
   provisioner "local-exec" {
     command = "mkdir ../ansible/jks-files"
   }
-  depends_on = [ null_resource.run_kafka_install ]
-  
+  depends_on = [null_resource.run_kafka_install]
+
 }
 
 resource "null_resource" "run_kafka_configure" {
-  depends_on = [null_resource.run_kafka_install,null_resource.create_jks_folder]
+  depends_on = [null_resource.run_kafka_install, null_resource.create_jks_folder]
 
   provisioner "local-exec" {
-    command = "${var.action == "plaintext" ? local.plaintext : local.saslssl}"
+    command     = var.action == "plaintext" ? local.plaintext : local.saslssl
     working_dir = "../ansible"
   }
 }
@@ -149,7 +149,7 @@ locals {
 # Create Virtual machine
 
 resource "vsphere_virtual_machine" "kafka_hosts" {
-  count            = var.kafka_vm_count
+  count = var.kafka_vm_count
 
   datastore_id     = data.vsphere_datastore.datastore.id
   resource_pool_id = data.vsphere_resource_pool.pool.id

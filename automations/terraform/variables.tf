@@ -102,35 +102,35 @@ variable "kafka_vm_cidr" {
 }
 
 variable "kafka_vm_start_ip" {
-  
+
 }
 
 variable "kafka_vm_end_ip" {
-  
+
 }
 
 variable "kafka_config" {
   type = object({
-    kafka_version    = string
-    scala_version    = string
-    kafka_dir        = string
-    kafka_cluster_id = string
-    broker_port      = number
-    controller_port  = number
-    client_port      = number
-    sasl_username    = string
-    sasl_password    = string
-    keystore_pass    = string
-    key_pass         = string
-    truststore_pass  = string
-    client_password  = string
-    client_username  = string
-    kafka_topics     = list(string)
-    kafka_operations = list(string)
-    kafka_acl_groups = list(string)
-    ssl_keystore_type = string
+    kafka_version       = string
+    scala_version       = string
+    kafka_dir           = string
+    kafka_cluster_id    = string
+    broker_port         = number
+    controller_port     = number
+    client_port         = number
+    sasl_username       = string
+    sasl_password       = string
+    keystore_pass       = string
+    key_pass            = string
+    truststore_pass     = string
+    client_password     = string
+    client_username     = string
+    kafka_topics        = list(string)
+    kafka_operations    = list(string)
+    kafka_acl_groups    = list(string)
+    ssl_keystore_type   = string
     ssl_truststore_type = string
-    ssl_user_dn = string
+    ssl_user_dn         = string
   })
 }
 
@@ -151,19 +151,19 @@ variable "ansible_config" {
 }
 
 variable "action" {
-  type = string
-  default = "plaintext"
+  type        = string
+  default     = "plaintext"
   description = "Kafka provisioning action: saslssl, plaintext,ssl"
 }
 
 variable "certificate_config" {
   type = object({
-    org_unit        = string
-    org             = string
-    common_name     = string
-    locality        = string
-    state_province  = string
-    country         = string
-    cert_validity   = number
+    org_unit       = string
+    org            = string
+    common_name    = string
+    locality       = string
+    state_province = string
+    country        = string
+    cert_validity  = number
   })
 }
