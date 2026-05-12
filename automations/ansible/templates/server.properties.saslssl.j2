@@ -1,7 +1,6 @@
 process.roles=broker,controller
 
 node.id= {{ node_id }}
-KAFKA_CLUSTER_ID={{ KAFKA_CLUSTER_ID }}
 
 controller.quorum.voters={% for host in groups['all'] %}{{ loop.index }}@{{ hostvars[host]['inventory_hostname'] }}:{{ CONTROLLER_PORT }}{% if not loop.last %},{% endif %}{% endfor %}
 
